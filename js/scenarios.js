@@ -22,7 +22,9 @@ const SCENARIOS = {
             { time: '0:03', message: 'Обнаружен объект', zone: 'Камера 1', severity: 'info', type: 'event' },
             { time: '0:04', message: 'Измерение диаметра', zone: 'Камера 1', severity: 'info', type: 'event' },
             { time: '0:05', message: 'Результат: 85.12 px (10 mm)', zone: 'Камера 1', severity: 'info', type: 'event' },
-            { time: '0:06', message: 'Результат: 186.34 px (22 mm)', zone: 'Камера 1', severity: 'info', type: 'event' }
+            { time: '0:06', message: 'Результат: 186.34 px (22 mm)', zone: 'Камера 1', severity: 'info', type: 'event' },
+            { time: '0:10', message: 'Объект покидает зону проверки', zone: 'Камера 1', severity: 'info', type: 'event' },
+            { time: '0:17', message: 'Следующий цикл', zone: 'Камера 1', severity: 'info', type: 'event' }
         ]
     }
 };
