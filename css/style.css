@@ -1,0 +1,51 @@
+:root {
+    --primary: #0d6efd;
+    --success: #198754;
+    --danger: #dc3545;
+    --warning: #ffc107;
+    --info: #0dcaf0;
+    --dark: #212529;
+}
+
+.stat-card {
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+.stat-card:hover { transform: translateY(-2px); }
+.stat-value { font-size: 1.5rem; font-weight: 700; color: var(--dark); }
+.stat-label { font-size: 0.75rem; text-transform: uppercase; color: #6c757d; }
+
+#video-player {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    background: #000;
+}
+
+.table th { font-size: 0.75rem; text-transform: uppercase; color: #6c757d; }
+.table td { font-size: 0.85rem; vertical-align: middle; }
+.severity-badge { font-size: 0.7rem; padding: 0.25rem 0.5rem; }
+.severity-danger { background: var(--danger) !important; }
+.severity-warning { background: var(--warning) !important; color: #000 !important; }
+.severity-info { background: var(--info) !important; color: #000 !important; }
+
+#events-table tbody tr.new-row,
+#alerts-table tbody tr.new-row {
+    animation: highlightRow 1s ease-out;
+}
+@keyframes highlightRow {
+    0% { background: rgba(255,193,7,0.3); }
+    100% { background: transparent; }
+}
+
+.card { border-radius: 0.5rem; }
+.card-header { font-weight: 600; }
+.btn-group-sm .btn { padding: 0.25rem 0.5rem; }
+
+@media (max-width: 768px) {
+    .stat-value { font-size: 1.25rem; }
+    .btn-lg { padding: 0.5rem 1rem; font-size: 0.9rem; }
+    #video-placeholder p { font-size: 0.9rem; }
+}

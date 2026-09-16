@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boiler Safety Monitor — Web Demo</title>
+    <link href="lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="lib/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1">
+                <i class="bi bi-shield-check me-2"></i>Boiler Safety Monitor
+            </span>
+            <div class="d-flex align-items-center gap-3">
+                <span class="badge bg-secondary" id="scenario-badge">ocr</span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid p-3">
+        <div class="row g-3">
+            <!-- Video Panel -->
+            <div class="col-xl-7">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-camera-video me-2"></i>Видеомониторинг</h5>
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-secondary" id="btn-play" title="Play"><i class="bi bi-play-fill"></i></button>
+                            <button class="btn btn-outline-secondary" id="btn-pause" title="Pause"><i class="bi bi-pause-fill"></i></button>
+                            <button class="btn btn-outline-secondary" id="btn-stop" title="Stop"><i class="bi bi-stop-fill"></i></button>
+                        </div>
+                    </div>
+                    <div class="card-body p-0 position-relative" style="aspect-ratio: 16/9; background:#000;">
+                        <video id="video-player" playsinline muted preload="metadata" style="width:100%; height:100%; object-fit:contain; display:block;"></video>
+                        <div id="video-placeholder" class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center text-white bg-dark" style="z-index:2;">
+                            <i class="bi bi-camera-video" style="font-size: 4rem;"></i>
+                            <p class="mt-2">Нажмите «Старт» для начала мониторинга</p>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-light">
+                        <div class="d-flex flex-wrap gap-2 align-items-center">
+                            <div class="ms-auto small text-muted" id="video-time">0:00 / 0:00</div>
+                        </div>
+                        <input type="range" class="form-range mt-2" id="video-seek" min="0" max="100" value="0" style="display:none;">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Stats + Controls -->
+            <div class="col-xl-5">
+                <!-- Stats Cards -->
+                <div class="row g-2 mb-3">
+                    <div class="col-6"><div class="card stat-card"><div class="card-body text-center p-2"><div class="stat-value" id="stat-fps">0</div><div class="stat-label">FPS</div></div></div></div>
+                    <div class="col-6"><div class="card stat-card"><div class="card-body text-center p-2"><div class="stat-value" id="stat-gpu">0%</div><div class="stat-label">GPU</div></div></div></div>
+                    <div class="col-6"><div class="card stat-card"><div class="card-body text-center p-2"><div class="stat-value" id="stat-people">0</div><div class="stat-label">Люди</div></div></div></div>
+                    <div class="col-6"><div class="card stat-card"><div class="card-body text-center p-2"><div class="stat-value" id="stat-incidents">0</div><div class="stat-label">Инциденты</div></div></div></div>
+                    <div class="col-6"><div class="card stat-card"><div class="card-body text-center p-2"><div class="stat-value" id="stat-clips">0</div><div class="stat-label">Клипы</div></div></div></div>
+                    <div class="col-6"><div class="card stat-card"><div class="card-body text-center p-2"><div class="stat-value" id="stat-zones">0</div><div class="stat-label">Наруш. зон</div></div></div></div>
+                </div>
+
+                <!-- Control Buttons -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-grid gap-2 d-md-flex">
+                            <button class="btn btn-success btn-lg flex-fill" id="btn-start">
+                                <i class="bi bi-play-circle-fill me-2"></i>Старт
+                            </button>
+                            <button class="btn btn-warning btn-lg flex-fill" id="btn-pause-monitoring" disabled>
+                                <i class="bi bi-pause-circle-fill me-2"></i>Пауза
+                            </button>
+                            <button class="btn btn-danger btn-lg flex-fill" id="btn-stop-monitoring" disabled>
+                                <i class="bi bi-stop-circle-fill me-2"></i>Стоп
+                            </button>
+                        </div>
+                        <div class="mt-2 text-center small text-muted" id="monitoring-status">
+                            Статус: <span class="badge bg-secondary">Остановлен</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Events Table -->
+                <div class="card mb-3" style="max-height: 300px;">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0"><i class="bi bi-list-ul me-2"></i>События</h6>
+                        <button class="btn btn-sm btn-outline-secondary" id="btn-clear-events"><i class="bi bi-trash"></i></button>
+                    </div>
+                    <div class="card-body p-0" style="overflow-y: auto; max-height: 250px;">
+                        <table class="table table-sm table-hover mb-0" id="events-table">
+                            <thead class="table-light sticky-top">
+                                <tr><th>Время</th><th>Событие</th><th>Зона</th><th>Уровень</th></tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                        <div class="p-3 text-center text-muted small" id="events-empty">Событий нет</div>
+                    </div>
+                </div>
+
+                <!-- Alerts Table -->
+                <div class="card" style="max-height: 300px;">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Уведомления</h6>
+                        <button class="btn btn-sm btn-outline-secondary" id="btn-clear-alerts"><i class="bi bi-trash"></i></button>
+                    </div>
+                    <div class="card-body p-0" style="overflow-y: auto; max-height: 250px;">
+                        <table class="table table-sm table-hover mb-0" id="alerts-table">
+                            <thead class="table-light sticky-top">
+                                <tr><th>Время</th><th>Уведомление</th><th>Детали</th><th>Статус</th></tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                        <div class="p-3 text-center text-muted small" id="alerts-empty">Уведомлений нет</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scenario Config Modal -->
+    <div class="modal fade" id="scenarioModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Выбор сценария</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Сценарий</label>
+                        <select class="form-select" id="modal-scenario-select">
+                            <option value="ocr">OCR — Распознавание текста</option>
+                            <option value="diameter">Diameter — Измерение диаметра</option>
+                        </select>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="auto-load-video" checked>
+                        <label class="form-check-label" for="auto-load-video">Автоматически загружать соответствующее видео</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="button" class="btn btn-primary" id="btn-apply-scenario">Применить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="js/scenarios.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
