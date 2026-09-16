@@ -24,9 +24,6 @@ const els = {
     btnStart: $('btn-start'),
     btnPauseMon: $('btn-pause-monitoring'),
     btnStopMon: $('btn-stop-monitoring'),
-    btnPlay: $('btn-play'),
-    btnPause: $('btn-pause'),
-    btnStop: $('btn-stop'),
     videoSeek: $('video-seek'),
     videoTime: $('video-time'),
     status: $('monitoring-status'),
@@ -169,8 +166,6 @@ function updateUIState() {
     els.btnStart.disabled = a;
     els.btnPauseMon.disabled = !a || p;
     els.btnStopMon.disabled = !a;
-    els.btnPause.disabled = !a || p;
-    els.btnPlay.disabled = !a || p;
 
     const statusMap = [
         [false, 'bg-secondary', 'Остановлен'],
@@ -258,9 +253,6 @@ function initEventListeners() {
     els.btnStart.addEventListener('click', startMonitoring);
     els.btnPauseMon.addEventListener('click', pauseMonitoring);
     els.btnStopMon.addEventListener('click', stopMonitoring);
-    els.btnPlay.addEventListener('click', resumeMonitoring);
-    els.btnPause.addEventListener('click', pauseMonitoring);
-    els.btnStop.addEventListener('click', stopMonitoring);
 
     $('btn-clear-events').addEventListener('click', () => { STATE.events = []; renderEventsTable(); });
     $('btn-clear-alerts').addEventListener('click', () => { STATE.alerts = []; renderAlertsTable(); });
