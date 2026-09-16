@@ -30,6 +30,7 @@
 .severity-danger { background: var(--danger) !important; }
 .severity-warning { background: var(--warning) !important; color: #000 !important; }
 .severity-info { background: var(--info) !important; color: #000 !important; }
+.severity-success { background: var(--success) !important; }
 
 #events-table tbody tr.new-row,
 #alerts-table tbody tr.new-row {
