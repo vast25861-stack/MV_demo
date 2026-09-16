@@ -282,7 +282,7 @@ function initEventListeners() {
 }
 
 function init() {
-    loadScenario('behavior');
+    loadScenario('ocr');
     initEventListeners();
     updateUIState();
     renderEventsTable();
