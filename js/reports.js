@@ -34,7 +34,9 @@ const REPORT_DATA = {
             avgConfidence: 94.2,
             uniqueTexts: 28,
             cyclesPerHour: 45,
-        }
+        },
+        confidenceHistory: [92, 95, 94, 96, 93, 95, 94, 96, 94, 95],
+        statusCounts: { success: 142, info: 10, warning: 2, danger: 2 }
     },
     diameter: {
         name: 'Diameter — Измерение диаметра',
@@ -66,7 +68,10 @@ const REPORT_DATA = {
             avgDiameter1: 10.02,
             avgDiameter2: 21.98,
             precision: 0.15,
-        }
+        },
+        diameter1History: [10.01, 10.03, 9.99, 10.02, 10.04, 10.00, 10.02, 10.01, 10.03, 10.02],
+        diameter2History: [22.01, 21.99, 21.98, 22.02, 21.97, 22.00, 21.99, 22.01, 21.98, 21.99],
+        deviationHistory: [0.01, -0.01, 0.02, -0.02, 0.03, 0.00, 0.01, -0.01, 0.02, -0.01]
     }
 };
 
@@ -256,6 +261,242 @@ document.querySelectorAll('[data-range]').forEach(btn => {
     });
 });
 
+// Chart instances storage
+const charts = {};
+
+// Chart rendering functions
+function renderCharts() {
+    renderOcrCharts();
+    renderDiameterCharts();
+    renderGeneralCharts();
+}
+
+function renderOcrCharts() {
+    const ctx1 = document.getElementById('ocr-confidence-chart');
+    if (ctx1 && !charts.ocrConfidence) {
+        charts.ocrConfidence = new Chart(ctx1, {
+            type: 'line',
+            data: {
+                labels: REPORT_DATA.ocr.confidenceHistory.map((_, i) => `Цикл ${i+1}`),
+                datasets: [{
+                    label: 'Уверенность (%)',
+                    data: REPORT_DATA.ocr.confidenceHistory,
+                    borderColor: '#0d6efd',
+                    backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { min: 85, max: 100, ticks: { callback: v => v + '%' } }
+                }
+            }
+        });
+    }
+
+    const ctx2 = document.getElementById('ocr-status-chart');
+    if (ctx2 && !charts.ocrStatus) {
+        const s = REPORT_DATA.ocr.statusCounts;
+        charts.ocrStatus = new Chart(ctx2, {
+            type: 'doughnut',
+            data: {
+                labels: ['Успех', 'Инфо', 'Предупреждение', 'Ошибка'],
+                datasets: [{
+                    data: [s.success, s.info, s.warning, s.danger],
+                    backgroundColor: ['#198754', '#0dcaf0', '#ffc107', '#dc3545'],
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom' } }
+            }
+        });
+    }
+}
+
+function renderDiameterCharts() {
+    const ctx1 = document.getElementById('diameter-measure-chart');
+    if (ctx1 && !charts.diaMeasure) {
+        charts.diaMeasure = new Chart(ctx1, {
+            type: 'line',
+            data: {
+                labels: REPORT_DATA.diameter.diameter1History.map((_, i) => `Цикл ${i+1}`),
+                datasets: [
+                    {
+                        label: 'D1 (ном. 10 мм)',
+                        data: REPORT_DATA.diameter.diameter1History,
+                        borderColor: '#0d6efd',
+                        backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                        fill: false,
+                        tension: 0.3,
+                        pointRadius: 4,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'D2 (ном. 22 мм)',
+                        data: REPORT_DATA.diameter.diameter2History,
+                        borderColor: '#198754',
+                        backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                        fill: false,
+                        tension: 0.3,
+                        pointRadius: 4,
+                        yAxisID: 'y1'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { type: 'linear', position: 'left', min: 9.9, max: 10.1 },
+                    y1: { type: 'linear', position: 'right', min: 21.9, max: 22.1, grid: { drawOnChartArea: false } }
+                }
+            }
+        });
+    }
+
+    const ctx2 = document.getElementById('diameter-deviation-chart');
+    if (ctx2 && !charts.diaDeviation) {
+        charts.diaDeviation = new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: REPORT_DATA.diameter.deviationHistory.map((_, i) => `Цикл ${i+1}`),
+                datasets: [{
+                    label: 'Отклонение от номинала (мм)',
+                    data: REPORT_DATA.diameter.deviationHistory,
+                    backgroundColor: REPORT_DATA.diameter.deviationHistory.map(v => v > 0 ? '#dc3545' : '#198754'),
+                    borderColor: REPORT_DATA.diameter.deviationHistory.map(v => v > 0 ? '#b02a37' : '#146c43'),
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { title: { display: true, text: 'мм' } } }
+            }
+        });
+    }
+}
+
+function renderGeneralCharts() {
+    // Severity pie
+    const ctx1 = document.getElementById('severity-pie-chart');
+    const allEvents = [...REPORT_DATA.ocr.events, ...REPORT_DATA.diameter.events];
+    const counts = { danger: 0, warning: 0, info: 0, success: 0 };
+    allEvents.forEach(e => counts[e.severity] = (counts[e.severity] || 0) + 1);
+
+    if (ctx1 && !charts.severityPie) {
+        charts.severityPie = new Chart(ctx1, {
+            type: 'pie',
+            data: {
+                labels: ['Danger', 'Warning', 'Info', 'Success'],
+                datasets: [{
+                    data: [counts.danger, counts.warning, counts.info, counts.success],
+                    backgroundColor: ['#dc3545', '#ffc107', '#0dcaf0', '#198754'],
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'right' } }
+            }
+        });
+    }
+
+    // Scenario bar
+    const ctx2 = document.getElementById('scenario-bar-chart');
+    if (ctx2 && !charts.scenarioBar) {
+        charts.scenarioBar = new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: ['OCR', 'Diameter'],
+                datasets: [{
+                    label: 'Событий',
+                    data: [REPORT_DATA.ocr.totalEvents, REPORT_DATA.diameter.totalEvents],
+                    backgroundColor: ['#6c757d', '#0d6efd'],
+                    borderWidth: 1
+                }, {
+                    label: 'Уведомлений',
+                    data: [REPORT_DATA.ocr.alerts, REPORT_DATA.diameter.alerts],
+                    backgroundColor: ['#dc3545', '#dc3545'],
+                    borderWidth: 1
+                }, {
+                    label: 'Сессий',
+                    data: [REPORT_DATA.ocr.sessions, REPORT_DATA.diameter.sessions],
+                    backgroundColor: ['#198754', '#198754'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom' } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+    }
+
+    // Activity line (last 7 days)
+    const ctx3 = document.getElementById('activity-line-chart');
+    const days = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+    const ocrDaily = [18, 22, 15, 25, 20, 12, 8];
+    const diaDaily = [10, 14, 8, 16, 12, 6, 4];
+
+    if (ctx3 && !charts.activityLine) {
+        charts.activityLine = new Chart(ctx3, {
+            type: 'line',
+            data: {
+                labels: days,
+                datasets: [
+                    {
+                        label: 'OCR',
+                        data: ocrDaily,
+                        borderColor: '#6c757d',
+                        backgroundColor: 'rgba(108, 117, 125, 0.1)',
+                        fill: true,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'Diameter',
+                        data: diaDaily,
+                        borderColor: '#0d6efd',
+                        backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                        fill: true,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'Всего',
+                        data: ocrDaily.map((v, i) => v + diaDaily[i]),
+                        borderColor: '#198754',
+                        backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                        fill: true,
+                        tension: 0.3,
+                        borderDash: [5, 5]
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom' } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+    }
+}
+
 // Init
 document.addEventListener('DOMContentLoaded', () => {
     renderSummaryCards();
@@ -266,4 +507,5 @@ document.addEventListener('DOMContentLoaded', () => {
     renderTimeline('ocr');
     renderTimeline('diameter');
     renderGeneralStats();
+    renderCharts();
 });

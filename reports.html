@@ -93,6 +93,20 @@
                         </div>
                     </div>
                 </div>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header"><h6 class="mb-0"><i class="bi bi-bar-chart me-2"></i>Уверенность распознавания по циклам</h6></div>
+                            <div class="card-body"><canvas id="ocr-confidence-chart" height="200"></canvas></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header"><h6 class="mb-0"><i class="bi bi-pie-chart me-2"></i>Статус распознавания</h6></div>
+                            <div class="card-body"><canvas id="ocr-status-chart" height="200"></canvas></div>
+                        </div>
+                    </div>
+                </div>
                 <div class="card">
                     <div class="card-header"><h6 class="mb-0"><i class="bi bi-clock-history me-2"></i>Хронология событий (Timeline)</h6></div>
                     <div class="card-body" id="ocr-timeline"></div>
@@ -119,6 +133,20 @@
                         <div class="card h-100">
                             <div class="card-header"><h6 class="mb-0"><i class="bi bi-graph-up me-2"></i>Статистика измерений</h6></div>
                             <div class="card-body" id="diameter-stats"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header"><h6 class="mb-0"><i class="bi bi-graph-up-arrow me-2"></i>Измерения диаметра по циклам</h6></div>
+                            <div class="card-body"><canvas id="diameter-measure-chart" height="200"></canvas></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header"><h6 class="mb-0"><i class="bi bi-bullseye me-2"></i>Отклонение от номинала (мм)</h6></div>
+                            <div class="card-body"><canvas id="diameter-deviation-chart" height="200"></canvas></div>
                         </div>
                     </div>
                 </div>
@@ -165,6 +193,30 @@
                     </div>
                 </div>
 
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header"><h6 class="mb-0"><i class="bi bi-pie-chart-fill me-2"></i>Распределение по уровням важности</h6></div>
+                            <div class="card-body"><canvas id="severity-pie-chart" height="250"></canvas></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header"><h6 class="mb-0"><i class="bi bi-bar-chart-fill me-2"></i>События по сценариям</h6></div>
+                            <div class="card-body"><canvas id="scenario-bar-chart" height="250"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-12">
+                        <div class="card h-100">
+                            <div class="card-header"><h6 class="mb-0"><i class="bi bi-graph-up me-2"></i>Активность за последние 7 дней</h6></div>
+                            <div class="card-body"><canvas id="activity-line-chart" height="250"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="row g-3">
                     <div class="col-xl-8">
                         <div class="card">
@@ -181,7 +233,7 @@
                     </div>
                     <div class="col-xl-4">
                         <div class="card">
-                            <div class="card-header"><h6 class="mb-0"><i class="bi bi-pie-chart me-2"></i>Распределение по уровням</h6></div>
+                            <div class="card-header"><h6 class="mb-0"><i class="bi bi-pie-chart me-2"></i>Детальное распределение</h6></div>
                             <div class="card-body" id="severity-chart">
                                 <div class="d-flex align-items-center gap-3 mb-2">
                                     <div class="badge bg-danger fs-6" style="width: 20px; height: 20px;"></div>
@@ -215,6 +267,7 @@
     </div>
 
     <script src="lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="js/scenarios.js"></script>
     <script src="js/reports.js"></script>
 </body>
