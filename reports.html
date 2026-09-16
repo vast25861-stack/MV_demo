@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,62 +7,60 @@
     <link href="lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="lib/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
-    <style>
-        .stat-card { transition: transform .15s; }
-        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 .5rem 1rem rgba(0,0,0,.15); }
-        .table th { white-space: nowrap; }
-        .badge-scenario { font-size: .75rem; }
-        .timeline-item { position: relative; padding-left: 2rem; border-left: 2px solid #dee2e6; margin-bottom: 1rem; }
-        .timeline-item::before { content: ''; position: absolute; left: -6px; top: 0; width: 10px; height: 10px; border-radius: 50%; background: #0d6efd; border: 2px solid #fff; }
-        .timeline-item.warning::before { background: #ffc107; }
-        .timeline-item.danger::before { background: #dc3545; }
-        .timeline-item.info::before { background: #0dcaf0; }
-    </style>
 </head>
 <body>
-    <nav class="navbar navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a href="https://vdt-vision.tilda.ws/" class="navbar-brand mb-0 h1 text-decoration-none">
-                <i class="bi bi-house-fill me-2"></i>Home
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container-fluid px-4">
+            <a href="https://vdt-vision.tilda.ws/" class="navbar-brand text-decoration-none d-flex align-items-center gap-2" target="_blank" rel="noopener">
+                <div class="rounded-lg bg-gradient d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary), var(--info));">
+                    <i class="bi bi-shield-check text-white fs-4"></i>
+                </div>
+                <span class="fw-bold fs-4 text-dark d-none d-md-inline">Boiler Safety Monitor</span>
             </a>
-            <div class="d-flex align-items-center gap-3">
-                <a href="index.html" class="btn btn-outline-light btn-sm"><i class="bi bi-camera-video me-1"></i>Мониторинг</a>
-                <span class="badge bg-primary">Отчёты</span>
+            <div class="ms-auto d-flex align-items-center gap-3">
+                <a href="index.html" class="btn btn-outline-primary btn-sm d-none d-lg-inline-flex align-items-center gap-2" style="border-radius: var(--radius); padding: 0.5rem 1rem;">
+                    <i class="bi bi-camera-video"></i> Мониторинг
+                </a>
+                <span class="badge bg-primary px-3 py-2 fs-6">Отчёты</span>
             </div>
         </div>
     </nav>
 
-    <div class="container-fluid p-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2><i class="bi bi-file-earmark-text me-2"></i>Отчёты по сценариям</h2>
+    <main class="container-fluid px-4 py-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 animate-fade-in">
+            <div>
+                <h1 class="fw-bold mb-1" style="font-size: 1.75rem; letter-spacing: -0.02em;">Аналитические отчёты</h1>
+                <p class="text-muted mb-0 small">Мониторинг сценариев OCR и измерения диаметра</p>
+            </div>
             <div class="btn-group" role="group">
-                <button type="button" class="btn btn-outline-secondary active" data-range="day">День</button>
+                <button type="button" class="btn btn-outline-secondary active" data-range="day" style="border-radius: var(--radius) 0 0 var(--radius);">День</button>
                 <button type="button" class="btn btn-outline-secondary" data-range="week">Неделя</button>
-                <button type="button" class="btn btn-outline-secondary" data-range="month">Месяц</button>
+                <button type="button" class="btn btn-outline-secondary" data-range="month" style="border-radius: 0 var(--radius) var(--radius) 0;">Месяц</button>
             </div>
         </div>
 
         <!-- Summary Cards -->
-        <div class="row g-3 mb-4" id="summary-cards">
-            <!-- Filled by JS -->
-        </div>
+        <div class="row g-4 mb-4" id="summary-cards"></div>
 
         <!-- Tabs for Scenarios -->
         <ul class="nav nav-tabs mb-4" id="scenarioTabs" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="tab-ocr" data-bs-toggle="tab" data-bs-target="#panel-ocr" type="button" role="tab">
-                    <i class="bi bi-scanner me-1"></i>OCR — Распознавание текста
+                    <i class="bi bi-scanner me-1"></i> OCR — Распознавание текста
                 </button>
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="tab-diameter" data-bs-toggle="tab" data-bs-target="#panel-diameter" type="button" role="tab">
-                    <i class="bi bi-rulers me-1"></i>Diameter — Измерение диаметра
+                    <i class="bi bi-rulers me-1"></i> Diameter — Измерение диаметра
                 </button>
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="tab-general" data-bs-toggle="tab" data-bs-target="#panel-general" type="button" role="tab">
-                    <i class="bi bi-bar-chart me-1"></i>Общая статистика
+                    <i class="bi bi-bar-chart me-1"></i> Общая статистика
                 </button>
             </li>
         </ul>
@@ -70,13 +68,18 @@
         <div class="tab-content" id="scenarioTabContent">
             <!-- OCR Panel -->
             <div class="tab-pane fade show active" id="panel-ocr" role="tabpanel">
-                <div class="row g-3 mb-4">
-                    <div class="col-md-6">
+                <div class="row g-4 mb-4">
+                    <div class="col-xl-8 col-lg-7">
                         <div class="card h-100">
-                            <div class="card-header"><h6 class="mb-0"><i class="bi bi-list-check me-2"></i>События за период</h6></div>
-                            <div class="card-body p-0" style="max-height: 400px; overflow-y: auto;">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0 d-flex align-items-center gap-2">
+                                    <i class="bi bi-list-check text-info"></i> События за период
+                                </h6>
+                                <span class="badge bg-info px-3 py-2">18 записей</span>
+                            </div>
+                            <div class="card-body p-0" style="max-height: 450px; overflow-y: auto;">
                                 <table class="table table-sm table-hover mb-0" id="ocr-events-table">
-                                    <thead class="table-light sticky-top">
+                                    <thead class="sticky-top">
                                         <tr><th>Дата/Время</th><th>Событие</th><th>Зона</th><th>Уровень</th></tr>
                                     </thead>
                                     <tbody></tbody>
@@ -84,44 +87,65 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-xl-4 col-lg-5">
                         <div class="card h-100">
-                            <div class="card-header"><h6 class="mb-0"><i class="bi bi-graph-up me-2"></i>Статистика распознавания</h6></div>
-                            <div class="card-body" id="ocr-stats">
-                                <!-- Filled by JS -->
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0 d-flex align-items-center gap-2">
+                                    <i class="bi bi-graph-up text-success"></i> Статистика распознавания
+                                </h6>
                             </div>
+                            <div class="card-body" id="ocr-stats"></div>
                         </div>
                     </div>
                 </div>
-                <div class="row g-3 mb-4">
+
+                <div class="row g-4 mb-4">
                     <div class="col-md-6">
                         <div class="card h-100">
-                            <div class="card-header"><h6 class="mb-0"><i class="bi bi-bar-chart me-2"></i>Уверенность распознавания по циклам</h6></div>
+                            <div class="card-header">
+                                <h6 class="mb-0 d-flex align-items-center gap-2">
+                                    <i class="bi bi-bar-chart text-primary"></i> Уверенность распознавания по циклам
+                                </h6>
+                            </div>
                             <div class="card-body"><canvas id="ocr-confidence-chart" height="200"></canvas></div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="card h-100">
-                            <div class="card-header"><h6 class="mb-0"><i class="bi bi-pie-chart me-2"></i>Статус распознавания</h6></div>
+                            <div class="card-header">
+                                <h6 class="mb-0 d-flex align-items-center gap-2">
+                                    <i class="bi bi-pie-chart text-warning"></i> Статус распознавания
+                                </h6>
+                            </div>
                             <div class="card-body"><canvas id="ocr-status-chart" height="200"></canvas></div>
                         </div>
                     </div>
                 </div>
+
                 <div class="card">
-                    <div class="card-header"><h6 class="mb-0"><i class="bi bi-clock-history me-2"></i>Хронология событий (Timeline)</h6></div>
+                    <div class="card-header">
+                        <h6 class="mb-0 d-flex align-items-center gap-2">
+                            <i class="bi bi-clock-history text-purple" style="--purple: #8b5cf6;"></i> Хронология событий
+                        </h6>
+                    </div>
                     <div class="card-body" id="ocr-timeline"></div>
                 </div>
             </div>
 
             <!-- Diameter Panel -->
             <div class="tab-pane fade" id="panel-diameter" role="tabpanel">
-                <div class="row g-3 mb-4">
-                    <div class="col-md-6">
+                <div class="row g-4 mb-4">
+                    <div class="col-xl-8 col-lg-7">
                         <div class="card h-100">
-                            <div class="card-header"><h6 class="mb-0"><i class="bi bi-list-check me-2"></i>События за период</h6></div>
-                            <div class="card-body p-0" style="max-height: 400px; overflow-y: auto;">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0 d-flex align-items-center gap-2">
+                                    <i class="bi bi-list-check text-info"></i> События за период
+                                </h6>
+                                <span class="badge bg-info px-3 py-2">15 записей</span>
+                            </div>
+                            <div class="card-body p-0" style="max-height: 450px; overflow-y: auto;">
                                 <table class="table table-sm table-hover mb-0" id="diameter-events-table">
-                                    <thead class="table-light sticky-top">
+                                    <thead class="sticky-top">
                                         <tr><th>Дата/Время</th><th>Событие</th><th>Зона</th><th>Уровень</th></tr>
                                     </thead>
                                     <tbody></tbody>
@@ -129,63 +153,93 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-xl-4 col-lg-5">
                         <div class="card h-100">
-                            <div class="card-header"><h6 class="mb-0"><i class="bi bi-graph-up me-2"></i>Статистика измерений</h6></div>
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0 d-flex align-items-center gap-2">
+                                    <i class="bi bi-graph-up text-success"></i> Статистика измерений
+                                </h6>
+                            </div>
                             <div class="card-body" id="diameter-stats"></div>
                         </div>
                     </div>
                 </div>
-                <div class="row g-3 mb-4">
+
+                <div class="row g-4 mb-4">
                     <div class="col-md-6">
                         <div class="card h-100">
-                            <div class="card-header"><h6 class="mb-0"><i class="bi bi-graph-up-arrow me-2"></i>Измерения диаметра по циклам</h6></div>
+                            <div class="card-header">
+                                <h6 class="mb-0 d-flex align-items-center gap-2">
+                                    <i class="bi bi-graph-up-arrow text-primary"></i> Измерения диаметра по циклам
+                                </h6>
+                            </div>
                             <div class="card-body"><canvas id="diameter-measure-chart" height="200"></canvas></div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="card h-100">
-                            <div class="card-header"><h6 class="mb-0"><i class="bi bi-bullseye me-2"></i>Отклонение от номинала (мм)</h6></div>
+                            <div class="card-header">
+                                <h6 class="mb-0 d-flex align-items-center gap-2">
+                                    <i class="bi bi-bullseye text-danger"></i> Отклонение от номинала (мм)
+                                </h6>
+                            </div>
                             <div class="card-body"><canvas id="diameter-deviation-chart" height="200"></canvas></div>
                         </div>
                     </div>
                 </div>
+
                 <div class="card">
-                    <div class="card-header"><h6 class="mb-0"><i class="bi bi-clock-history me-2"></i>Хронология событий (Timeline)</h6></div>
+                    <div class="card-header">
+                        <h6 class="mb-0 d-flex align-items-center gap-2">
+                            <i class="bi bi-clock-history text-purple" style="--purple: #8b5cf6;"></i> Хронология событий
+                        </h6>
+                    </div>
                     <div class="card-body" id="diameter-timeline"></div>
                 </div>
             </div>
 
             <!-- General Stats Panel -->
             <div class="tab-pane fade" id="panel-general" role="tabpanel">
-                <div class="row g-3 mb-4">
+                <div class="row g-4 mb-4">
                     <div class="col-xl-3 col-md-6">
-                        <div class="card stat-card bg-primary text-white">
-                            <div class="card-body">
+                        <div class="card stat-card h-100">
+                            <div class="card-body text-center p-4">
+                                <div class="rounded-circle bg-primary-light d-inline-flex align-items-center justify-content-center mb-3" style="width: 56px; height: 56px;">
+                                    <i class="bi bi-activity text-primary fs-2"></i>
+                                </div>
                                 <div class="stat-value fs-1" id="total-events">0</div>
                                 <div class="stat-label">Всего событий</div>
                             </div>
                         </div>
                     </div>
                     <div class="col-xl-3 col-md-6">
-                        <div class="card stat-card bg-success text-white">
-                            <div class="card-body">
+                        <div class="card stat-card h-100">
+                            <div class="card-body text-center p-4">
+                                <div class="rounded-circle bg-success-light d-inline-flex align-items-center justify-content-center mb-3" style="width: 56px; height: 56px;">
+                                    <i class="bi bi-play-circle-fill text-success fs-2"></i>
+                                </div>
                                 <div class="stat-value fs-1" id="total-sessions">0</div>
                                 <div class="stat-label">Сессий мониторинга</div>
                             </div>
                         </div>
                     </div>
                     <div class="col-xl-3 col-md-6">
-                        <div class="card stat-card bg-warning text-dark">
-                            <div class="card-body">
+                        <div class="card stat-card h-100">
+                            <div class="card-body text-center p-4">
+                                <div class="rounded-circle bg-warning-light d-inline-flex align-items-center justify-content-center mb-3" style="width: 56px; height: 56px;">
+                                    <i class="bi bi-bell-fill text-warning fs-2"></i>
+                                </div>
                                 <div class="stat-value fs-1" id="total-alerts">0</div>
                                 <div class="stat-label">Уведомлений</div>
                             </div>
                         </div>
                     </div>
                     <div class="col-xl-3 col-md-6">
-                        <div class="card stat-card bg-info text-white">
-                            <div class="card-body">
+                        <div class="card stat-card h-100">
+                            <div class="card-body text-center p-4">
+                                <div class="rounded-circle bg-info-light d-inline-flex align-items-center justify-content-center mb-3" style="width: 56px; height: 56px;">
+                                    <i class="bi bi-clock-history text-info fs-2"></i>
+                                </div>
                                 <div class="stat-value fs-1" id="avg-duration">0 мин</div>
                                 <div class="stat-label">Средняя длительность</div>
                             </div>
@@ -193,37 +247,53 @@
                     </div>
                 </div>
 
-                <div class="row g-3 mb-4">
-                    <div class="col-md-6">
+                <div class="row g-4 mb-4">
+                    <div class="col-lg-6">
                         <div class="card h-100">
-                            <div class="card-header"><h6 class="mb-0"><i class="bi bi-pie-chart-fill me-2"></i>Распределение по уровням важности</h6></div>
-                            <div class="card-body"><canvas id="severity-pie-chart" height="250"></canvas></div>
+                            <div class="card-header">
+                                <h6 class="mb-0 d-flex align-items-center gap-2">
+                                    <i class="bi bi-pie-chart-fill text-danger"></i> Распределение по уровням важности
+                                </h6>
+                            </div>
+                            <div class="card-body d-flex align-items-center justify-content-center"><canvas id="severity-pie-chart" height="280"></canvas></div>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-lg-6">
                         <div class="card h-100">
-                            <div class="card-header"><h6 class="mb-0"><i class="bi bi-bar-chart-fill me-2"></i>События по сценариям</h6></div>
-                            <div class="card-body"><canvas id="scenario-bar-chart" height="250"></canvas></div>
+                            <div class="card-header">
+                                <h6 class="mb-0 d-flex align-items-center gap-2">
+                                    <i class="bi bi-bar-chart-fill text-primary"></i> События по сценариям
+                                </h6>
+                            </div>
+                            <div class="card-body d-flex align-items-center justify-content-center"><canvas id="scenario-bar-chart" height="280"></canvas></div>
                         </div>
                     </div>
                 </div>
 
-                <div class="row g-3 mb-4">
+                <div class="row g-4 mb-4">
                     <div class="col-12">
                         <div class="card h-100">
-                            <div class="card-header"><h6 class="mb-0"><i class="bi bi-graph-up me-2"></i>Активность за последние 7 дней</h6></div>
-                            <div class="card-body"><canvas id="activity-line-chart" height="250"></canvas></div>
+                            <div class="card-header">
+                                <h6 class="mb-0 d-flex align-items-center gap-2">
+                                    <i class="bi bi-graph-up text-success"></i> Активность за последние 7 дней
+                                </h6>
+                            </div>
+                            <div class="card-body"><canvas id="activity-line-chart" height="280"></canvas></div>
                         </div>
                     </div>
                 </div>
 
-                <div class="row g-3">
+                <div class="row g-4">
                     <div class="col-xl-8">
-                        <div class="card">
-                            <div class="card-header"><h6 class="mb-0"><i class="bi bi-table me-2"></i>Сводная таблица по сценариям</h6></div>
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h6 class="mb-0 d-flex align-items-center gap-2">
+                                    <i class="bi bi-table text-info"></i> Сводная таблица по сценариям
+                                </h6>
+                            </div>
                             <div class="card-body p-0">
                                 <table class="table table-hover mb-0" id="summary-table">
-                                    <thead class="table-light">
+                                    <thead class="sticky-top">
                                         <tr><th>Сценарий</th><th>Событий</th><th>Уведомлений</th><th>Сессий</th><th>Ср. длительность</th><th>Последний запуск</th></tr>
                                     </thead>
                                     <tbody></tbody>
@@ -232,24 +302,28 @@
                         </div>
                     </div>
                     <div class="col-xl-4">
-                        <div class="card">
-                            <div class="card-header"><h6 class="mb-0"><i class="bi bi-pie-chart me-2"></i>Детальное распределение</h6></div>
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h6 class="mb-0 d-flex align-items-center gap-2">
+                                    <i class="bi bi-pie-chart text-warning"></i> Детальное распределение
+                                </h6>
+                            </div>
                             <div class="card-body" id="severity-chart">
-                                <div class="d-flex align-items-center gap-3 mb-2">
-                                    <div class="badge bg-danger fs-6" style="width: 20px; height: 20px;"></div>
-                                    <span>Danger <span id="cnt-danger" class="badge bg-secondary ms-2">0</span></span>
+                                <div class="d-flex align-items-center gap-3 mb-3">
+                                    <div class="rounded-circle" style="width: 12px; height: 12px; background: var(--danger);"></div>
+                                    <span class="fw-medium">Danger <span id="cnt-danger" class="badge bg-danger ms-2">0</span></span>
                                 </div>
-                                <div class="d-flex align-items-center gap-3 mb-2">
-                                    <div class="badge bg-warning text-dark fs-6" style="width: 20px; height: 20px;"></div>
-                                    <span>Warning <span id="cnt-warning" class="badge bg-secondary ms-2">0</span></span>
+                                <div class="d-flex align-items-center gap-3 mb-3">
+                                    <div class="rounded-circle" style="width: 12px; height: 12px; background: var(--warning);"></div>
+                                    <span class="fw-medium">Warning <span id="cnt-warning" class="badge bg-warning text-dark ms-2">0</span></span>
                                 </div>
-                                <div class="d-flex align-items-center gap-3 mb-2">
-                                    <div class="badge bg-info fs-6" style="width: 20px; height: 20px;"></div>
-                                    <span>Info <span id="cnt-info" class="badge bg-secondary ms-2">0</span></span>
+                                <div class="d-flex align-items-center gap-3 mb-3">
+                                    <div class="rounded-circle" style="width: 12px; height: 12px; background: var(--info);"></div>
+                                    <span class="fw-medium">Info <span id="cnt-info" class="badge bg-info ms-2">0</span></span>
                                 </div>
-                                <div class="d-flex align-items-center gap-3 mb-2">
-                                    <div class="badge bg-success fs-6" style="width: 20px; height: 20px;"></div>
-                                    <span>Success <span id="cnt-success" class="badge bg-secondary ms-2">0</span></span>
+                                <div class="d-flex align-items-center gap-3 mb-3">
+                                    <div class="rounded-circle" style="width: 12px; height: 12px; background: var(--success);"></div>
+                                    <span class="fw-medium">Success <span id="cnt-success" class="badge bg-success ms-2">0</span></span>
                                 </div>
                             </div>
                         </div>
@@ -259,12 +333,12 @@
         </div>
 
         <!-- Export Buttons -->
-        <div class="mt-4 d-flex gap-2">
-            <button class="btn btn-outline-primary" onclick="exportReport('csv')"><i class="bi bi-filetype-csv me-1"></i>Экспорт CSV</button>
-            <button class="btn btn-outline-secondary" onclick="exportReport('json')"><i class="bi bi-filetype-json me-1"></i>Экспорт JSON</button>
-            <button class="btn btn-outline-secondary" onclick="printReport()"><i class="bi bi-printer me-1"></i>Печать</button>
+        <div class="mt-4 d-flex flex-wrap gap-2 animate-fade-in">
+            <button class="btn btn-primary" onclick="exportReport('csv')"><i class="bi bi-filetype-csv me-1"></i> Экспорт CSV</button>
+            <button class="btn btn-outline-secondary" onclick="exportReport('json')"><i class="bi bi-filetype-json me-1"></i> Экспорт JSON</button>
+            <button class="btn btn-outline-secondary" onclick="printReport()"><i class="bi bi-printer me-1"></i> Печать</button>
         </div>
-    </div>
+    </main>
 
     <script src="lib/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,38 +7,69 @@
     <link href="lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="lib/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
 </head>
 <body>
-    <nav class="navbar navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a href="https://vdt-vision.tilda.ws/" class="navbar-brand mb-0 h1 text-decoration-none">
-                <i class="bi bi-house-fill me-2"></i>Home
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container-fluid px-4">
+            <a href="https://vdt-vision.tilda.ws/" class="navbar-brand text-decoration-none d-flex align-items-center gap-2" target="_blank" rel="noopener">
+                <div class="rounded-lg bg-gradient d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary), var(--info));">
+                    <i class="bi bi-shield-check text-white fs-4"></i>
+                </div>
+                <span class="fw-bold fs-4 text-dark d-none d-md-inline">Boiler Safety Monitor</span>
             </a>
+            <div class="ms-auto d-flex align-items-center gap-3">
+                <a href="reports.html" class="btn btn-outline-primary btn-sm d-none d-lg-inline-flex align-items-center gap-2" style="border-radius: var(--radius); padding: 0.5rem 1rem;">
+                    <i class="bi bi-graph-up"></i> Отчёты
+                </a>
+                <span class="badge bg-secondary px-3 py-2 fs-6" id="scenario-badge" role="button" data-bs-toggle="tooltip" title="Клик для выбора сценария">OCR</span>
+            </div>
         </div>
     </nav>
 
-    <div class="container-fluid p-3">
-        <div class="row g-3">
+    <main class="container-fluid px-4 py-4">
+        <div class="row g-4">
             <!-- Video Panel -->
             <div class="col-xl-7">
-                <div class="card h-100">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0"><i class="bi bi-camera-video me-2"></i>Видеомониторинг</h5>
-                        <span class="badge bg-secondary" id="scenario-badge" role="button">diameter</span>
-                    </div>
-                    <div class="card-body p-0 position-relative" style="aspect-ratio: 16/9; background:#000;">
-                        <video id="video-player" playsinline muted preload="metadata" style="width:100%; height:100%; object-fit:contain; display:block;"></video>
-                        <div id="video-placeholder" class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center text-white bg-dark" style="z-index:2;">
-                            <i class="bi bi-camera-video" style="font-size: 4rem;"></i>
-                            <p class="mt-2">Нажмите «Старт» для начала мониторинга</p>
+                <div class="card h-100 overflow-hidden animate-fade-in">
+                    <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+                        <h5 class="mb-0 d-flex align-items-center gap-2">
+                            <div class="rounded bg-primary-light p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                <i class="bi bi-camera-video text-primary fs-5"></i>
+                            </div>
+                            <span>Видеомониторинг</span>
+                        </h5>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-primary px-3 py-2" id="video-status-badge">
+                                <span class="animate-pulse me-1">●</span> Ожидание
+                            </span>
                         </div>
                     </div>
-                    <div class="card-footer bg-light">
+                    <div class="card-body p-0 position-relative" style="aspect-ratio: 16/9; background: #0a0a0a;">
+                        <video id="video-player" playsinline muted preload="metadata" style="width:100%; height:100%; object-fit:contain; display:block; border-radius: 0 0 var(--radius-lg) var(--radius-lg);"></video>
+                        <div id="video-placeholder" class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center text-white" style="z-index:2; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius: 0 0 var(--radius-lg) var(--radius-lg);">
+                            <div class="rounded-circle bg-white/10 p-4 mb-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                                <i class="bi bi-camera-video fs-1 text-white/70"></i>
+                            </div>
+                            <h5 class="mb-1 text-white">Готов к мониторингу</h5>
+                            <p class="text-white/50 mb-0 small">Нажмите «Старт» для начала видеонаблюдения</p>
+                        </div>
+                        <div class="position-absolute bottom-0 start-0 end-0 p-3 pointer-events-none" style="z-index: 10; background: linear-gradient(transparent, rgba(0,0,0,0.7)); border-radius: 0 0 var(--radius-lg) var(--radius-lg);">
+                            <div class="d-flex justify-content-between align-items-center pointer-events-auto">
+                                <div class="text-white/80 small" id="video-time">0:00 / 0:00</div>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-sm btn-light rounded-pill px-3" id="btn-fullscreen" title="Во весь экран" style="backdrop-filter: blur(4px);"><i class="bi bi-fullscreen"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-top p-3">
                         <div class="d-flex flex-wrap gap-2 align-items-center">
-                            <div class="ms-auto small text-muted" id="video-time">0:00 / 0:00</div>
+                            <input type="range" class="form-range flex-grow-1" id="video-seek" min="0" max="100" value="0" style="display:none; height: 6px;">
                         </div>
-                        <input type="range" class="form-range mt-2" id="video-seek" min="0" max="100" value="0" style="display:none;">
                     </div>
                 </div>
             </div>
@@ -46,96 +77,184 @@
             <!-- Right Panel: Stats + Controls -->
             <div class="col-xl-5">
                 <!-- Stats Cards -->
-                <div class="row g-2 mb-3">
-                    <div class="col-6"><div class="card stat-card"><div class="card-body text-center p-2"><div class="stat-value" id="stat-fps">0</div><div class="stat-label">FPS</div></div></div></div>
-                    <div class="col-6"><div class="card stat-card"><div class="card-body text-center p-2"><div class="stat-value" id="stat-gpu">0%</div><div class="stat-label">GPU</div></div></div></div>
-                    <div class="col-6"><div class="card stat-card"><div class="card-body text-center p-2"><div class="stat-value" id="stat-people">0</div><div class="stat-label">Люди</div></div></div></div>
-                    <div class="col-6"><div class="card stat-card"><div class="card-body text-center p-2"><div class="stat-value" id="stat-incidents">0</div><div class="stat-label">Инциденты</div></div></div></div>
-                    <div class="col-6"><div class="card stat-card"><div class="card-body text-center p-2"><div class="stat-value" id="stat-clips">0</div><div class="stat-label">Клипы</div></div></div></div>
-                    <div class="col-6"><div class="card stat-card"><div class="card-body text-center p-2"><div class="stat-value" id="stat-zones">0</div><div class="stat-label">Наруш. зон</div></div></div></div>
+                <div class="row g-3 mb-4">
+                    <div class="col-6">
+                        <div class="card stat-card h-100 animate-slide-in" style="animation-delay: 50ms;">
+                            <div class="card-body text-center p-3">
+                                <div class="rounded-circle bg-primary-light d-inline-flex align-items-center justify-content-center mb-2" style="width: 44px; height: 44px;">
+                                    <i class="bi bi-speedometer2 text-primary fs-4"></i>
+                                </div>
+                                <div class="stat-value" id="stat-fps">0</div>
+                                <div class="stat-label">FPS</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card stat-card h-100 animate-slide-in" style="animation-delay: 100ms;">
+                            <div class="card-body text-center p-3">
+                                <div class="rounded-circle bg-success-light d-inline-flex align-items-center justify-content-center mb-2" style="width: 44px; height: 44px;">
+                                    <i class="bi bi-cpu-fill text-success fs-4"></i>
+                                </div>
+                                <div class="stat-value" id="stat-gpu">0%</div>
+                                <div class="stat-label">GPU</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card stat-card h-100 animate-slide-in" style="animation-delay: 150ms;">
+                            <div class="card-body text-center p-3">
+                                <div class="rounded-circle bg-info-light d-inline-flex align-items-center justify-content-center mb-2" style="width: 44px; height: 44px;">
+                                    <i class="bi bi-people-fill text-info fs-4"></i>
+                                </div>
+                                <div class="stat-value" id="stat-people">0</div>
+                                <div class="stat-label">Люди</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card stat-card h-100 animate-slide-in" style="animation-delay: 200ms;">
+                            <div class="card-body text-center p-3">
+                                <div class="rounded-circle bg-danger-light d-inline-flex align-items-center justify-content-center mb-2" style="width: 44px; height: 44px;">
+                                    <i class="bi bi-exclamation-triangle-fill text-danger fs-4"></i>
+                                </div>
+                                <div class="stat-value" id="stat-incidents">0</div>
+                                <div class="stat-label">Инциденты</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card stat-card h-100 animate-slide-in" style="animation-delay: 250ms;">
+                            <div class="card-body text-center p-3">
+                                <div class="rounded-circle bg-warning-light d-inline-flex align-items-center justify-content-center mb-2" style="width: 44px; height: 44px;">
+                                    <i class="bi bi-film text-warning fs-4"></i>
+                                </div>
+                                <div class="stat-value" id="stat-clips">0</div>
+                                <div class="stat-label">Клипы</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card stat-card h-100 animate-slide-in" style="animation-delay: 300ms;">
+                            <div class="card-body text-center p-3">
+                                <div class="rounded-circle bg-purple-light d-inline-flex align-items-center justify-content-center mb-2" style="width: 44px; height: 44px;">
+                                    <i class="bi bi-shield-lock text-purple fs-4" style="--purple: #8b5cf6;"></i>
+                                </div>
+                                <div class="stat-value" id="stat-zones">0</div>
+                                <div class="stat-label">Наруш. зон</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Control Buttons -->
-                <div class="card mb-3">
+                <div class="card mb-4 animate-fade-in" style="animation-delay: 100ms;">
+                    <div class="card-header">
+                        <h6 class="mb-0 d-flex align-items-center gap-2">
+                            <i class="bi bi-control text-primary"></i> Управление
+                        </h6>
+                    </div>
                     <div class="card-body">
                         <div class="d-grid gap-2 d-md-flex">
-                            <button class="btn btn-success btn-lg flex-fill" id="btn-start">
-                                <i class="bi bi-play-circle-fill me-2"></i>Старт
+                            <button class="btn btn-success btn-lg flex-fill d-flex align-items-center justify-content-center gap-2" id="btn-start">
+                                <i class="bi bi-play-circle-fill fs-4"></i> <span>Старт</span>
                             </button>
-                            <button class="btn btn-warning btn-lg flex-fill" id="btn-pause-monitoring" disabled>
-                                <i class="bi bi-pause-circle-fill me-2"></i>Пауза
+                            <button class="btn btn-warning btn-lg flex-fill d-flex align-items-center justify-content-center gap-2" id="btn-pause-monitoring" disabled>
+                                <i class="bi bi-pause-circle-fill fs-4"></i> <span>Пауза</span>
                             </button>
-                            <button class="btn btn-danger btn-lg flex-fill" id="btn-stop-monitoring" disabled>
-                                <i class="bi bi-stop-circle-fill me-2"></i>Стоп
+                            <button class="btn btn-danger btn-lg flex-fill d-flex align-items-center justify-content-center gap-2" id="btn-stop-monitoring" disabled>
+                                <i class="bi bi-stop-circle-fill fs-4"></i> <span>Стоп</span>
                             </button>
                         </div>
-                        <div class="mt-2 text-center small text-muted" id="monitoring-status">
-                            Статус: <span class="badge bg-secondary">Остановлен</span>
+                        <div class="mt-3 text-center">
+                            <div class="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-pill bg-tertiary" id="monitoring-status">
+                                <span class="rounded-circle" id="status-dot" style="width: 8px; height: 8px; background: var(--gray-400);"></span>
+                                <span class="small fw-medium" id="status-text">Остановлен</span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Events Table -->
-                <div class="card mb-3" style="max-height: 300px;">
+                <div class="card mb-4 animate-fade-in" style="animation-delay: 150ms;">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h6 class="mb-0"><i class="bi bi-list-ul me-2"></i>События</h6>
-                        <button class="btn btn-sm btn-outline-secondary" id="btn-clear-events"><i class="bi bi-trash"></i></button>
+                        <h6 class="mb-0 d-flex align-items-center gap-2">
+                            <i class="bi bi-list-ul text-info"></i> События
+                        </h6>
+                        <button class="btn btn-sm btn-outline-secondary rounded-pill" id="btn-clear-events" title="Очистить">
+                            <i class="bi bi-trash"></i>
+                        </button>
                     </div>
-                    <div class="card-body p-0" style="overflow-y: auto; max-height: 250px;">
+                    <div class="card-body p-0" style="max-height: 300px; overflow-y: auto;">
                         <table class="table table-sm table-hover mb-0" id="events-table">
-                            <thead class="table-light sticky-top">
+                            <thead class="sticky-top">
                                 <tr><th>Время</th><th>Событие</th><th>Зона</th><th>Уровень</th></tr>
                             </thead>
                             <tbody></tbody>
                         </table>
-                        <div class="p-3 text-center text-muted small" id="events-empty">Событий нет</div>
+                        <div class="p-4 text-center" id="events-empty">
+                            <i class="bi bi-inbox fs-1 text-muted mb-2 d-block"></i>
+                            <span class="text-muted small">Событий пока нет</span>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Alerts Table -->
-                <div class="card" style="max-height: 300px;">
+                <div class="card animate-fade-in" style="animation-delay: 200ms;">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h6 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Уведомления</h6>
-                        <button class="btn btn-sm btn-outline-secondary" id="btn-clear-alerts"><i class="bi bi-trash"></i></button>
+                        <h6 class="mb-0 d-flex align-items-center gap-2">
+                            <i class="bi bi-bell-fill text-warning"></i> Уведомления
+                        </h6>
+                        <button class="btn btn-sm btn-outline-secondary rounded-pill" id="btn-clear-alerts" title="Очистить">
+                            <i class="bi bi-trash"></i>
+                        </button>
                     </div>
-                    <div class="card-body p-0" style="overflow-y: auto; max-height: 250px;">
+                    <div class="card-body p-0" style="max-height: 300px; overflow-y: auto;">
                         <table class="table table-sm table-hover mb-0" id="alerts-table">
-                            <thead class="table-light sticky-top">
+                            <thead class="sticky-top">
                                 <tr><th>Время</th><th>Уведомление</th><th>Детали</th><th>Статус</th></tr>
                             </thead>
                             <tbody></tbody>
                         </table>
-                        <div class="p-3 text-center text-muted small" id="alerts-empty">Уведомлений нет</div>
+                        <div class="p-4 text-center" id="alerts-empty">
+                            <i class="bi bi-bell-slash fs-1 text-muted mb-2 d-block"></i>
+                            <span class="text-muted small">Уведомлений нет</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 
     <!-- Scenario Config Modal -->
-    <div class="modal fade" id="scenarioModal" tabindex="-1">
-        <div class="modal-dialog">
+    <div class="modal fade" id="scenarioModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Выбор сценария</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold d-flex align-items-center gap-2">
+                        <i class="bi bi-diagram-3 text-primary"></i> Выбор сценария
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Сценарий</label>
-                        <select class="form-select" id="modal-scenario-select">
-                            <option value="ocr">OCR — Распознавание текста</option>
-                            <option value="diameter">Diameter — Измерение диаметра</option>
+                <div class="modal-body pt-0">
+                    <div class="mb-4">
+                        <label class="form-label fw-medium">Сценарий мониторинга</label>
+                        <select class="form-select" id="modal-scenario-select" style="padding: 0.75rem 1rem;">
+                            <option value="ocr" data-icon="bi-scanner">OCR — Распознавание текста</option>
+                            <option value="diameter" data-icon="bi-rulers">Diameter — Измерение диаметра</option>
                         </select>
                     </div>
                     <div class="form-check mb-3">
                         <input class="form-check-input" type="checkbox" id="auto-load-video" checked>
-                        <label class="form-check-label" for="auto-load-video">Автоматически загружать соответствующее видео</label>
+                        <label class="form-check-label fw-medium" for="auto-load-video">
+                            <i class="bi bi-check-circle-fill text-success me-1"></i> Автоматически загружать видео сценария
+                        </label>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                    <button type="button" class="btn btn-primary" id="btn-apply-scenario">Применить</button>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Отмена</button>
+                    <button type="button" class="btn btn-primary rounded-pill px-4" id="btn-apply-scenario">
+                        <i class="bi bi-check-lg me-1"></i> Применить
+                    </button>
                 </div>
             </div>
         </div>
