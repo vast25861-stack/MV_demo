@@ -63,11 +63,13 @@
                     <i class="bi bi-house-fill text-white fs-4" style="text-shadow: 0 2px 4px rgba(0,0,0,0.4);"></i>
                 </div>
             </a>
+            <div class="ms-3 d-flex align-items-center gap-3">
+                <span class="badge bg-secondary px-3 py-2 fs-6" id="scenario-badge" role="button" data-bs-toggle="tooltip" title="Клик для выбора сценария" style="cursor: pointer;">OCR</span>
+            </div>
             <div class="ms-auto d-flex align-items-center gap-3">
                 <a href="reports.html" class="btn btn-outline-primary btn-sm d-none d-lg-inline-flex align-items-center gap-2" style="border-radius: var(--radius); padding: 0.5rem 1rem;">
                     <i class="bi bi-graph-up"></i> Отчёты
                 </a>
-                <span class="badge bg-secondary px-3 py-2 fs-6" id="scenario-badge" role="button" data-bs-toggle="tooltip" title="Клик для выбора сценария">OCR</span>
             </div>
         </div>
     </nav>
@@ -82,7 +84,7 @@
                             <div class="rounded bg-primary-light p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
                                 <i class="bi bi-camera-video text-primary fs-5"></i>
                             </div>
-                            <span>Видеомониторинг</span>
+                            <span id="scenario-title">OCR</span>
                         </h5>
                         <div class="d-flex align-items-center gap-2">
                             <span class="badge bg-primary px-3 py-2" id="video-status-badge">

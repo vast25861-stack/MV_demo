@@ -68,6 +68,31 @@
         <div class="tab-content" id="scenarioTabContent">
             <!-- OCR Panel -->
             <div class="tab-pane fade show active" id="panel-ocr" role="tabpanel">
+                <!-- Charts first -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h6 class="mb-0 d-flex align-items-center gap-2">
+                                    <i class="bi bi-bar-chart text-primary"></i> Уверенность распознавания по циклам
+                                </h6>
+                            </div>
+                            <div class="card-body"><canvas id="ocr-confidence-chart" height="200"></canvas></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h6 class="mb-0 d-flex align-items-center gap-2">
+                                    <i class="bi bi-pie-chart text-warning"></i> Статус распознавания
+                                </h6>
+                            </div>
+                            <div class="card-body"><canvas id="ocr-status-chart" height="200"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats and Events table -->
                 <div class="row g-4 mb-4">
                     <div class="col-xl-8 col-lg-7">
                         <div class="card h-100">
@@ -99,29 +124,6 @@
                     </div>
                 </div>
 
-                <div class="row g-4 mb-4">
-                    <div class="col-md-6">
-                        <div class="card h-100">
-                            <div class="card-header">
-                                <h6 class="mb-0 d-flex align-items-center gap-2">
-                                    <i class="bi bi-bar-chart text-primary"></i> Уверенность распознавания по циклам
-                                </h6>
-                            </div>
-                            <div class="card-body"><canvas id="ocr-confidence-chart" height="200"></canvas></div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card h-100">
-                            <div class="card-header">
-                                <h6 class="mb-0 d-flex align-items-center gap-2">
-                                    <i class="bi bi-pie-chart text-warning"></i> Статус распознавания
-                                </h6>
-                            </div>
-                            <div class="card-body"><canvas id="ocr-status-chart" height="200"></canvas></div>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="card">
                     <div class="card-header">
                         <h6 class="mb-0 d-flex align-items-center gap-2">
@@ -134,6 +136,31 @@
 
             <!-- Diameter Panel -->
             <div class="tab-pane fade" id="panel-diameter" role="tabpanel">
+                <!-- Charts first -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h6 class="mb-0 d-flex align-items-center gap-2">
+                                    <i class="bi bi-graph-up-arrow text-primary"></i> Измерения диаметра по циклам
+                                </h6>
+                            </div>
+                            <div class="card-body"><canvas id="diameter-measure-chart" height="200"></canvas></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h6 class="mb-0 d-flex align-items-center gap-2">
+                                    <i class="bi bi-bullseye text-danger"></i> Отклонение от номинала (мм)
+                                </h6>
+                            </div>
+                            <div class="card-body"><canvas id="diameter-deviation-chart" height="200"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats and Events table -->
                 <div class="row g-4 mb-4">
                     <div class="col-xl-8 col-lg-7">
                         <div class="card h-100">
@@ -165,29 +192,6 @@
                     </div>
                 </div>
 
-                <div class="row g-4 mb-4">
-                    <div class="col-md-6">
-                        <div class="card h-100">
-                            <div class="card-header">
-                                <h6 class="mb-0 d-flex align-items-center gap-2">
-                                    <i class="bi bi-graph-up-arrow text-primary"></i> Измерения диаметра по циклам
-                                </h6>
-                            </div>
-                            <div class="card-body"><canvas id="diameter-measure-chart" height="200"></canvas></div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card h-100">
-                            <div class="card-header">
-                                <h6 class="mb-0 d-flex align-items-center gap-2">
-                                    <i class="bi bi-bullseye text-danger"></i> Отклонение от номинала (мм)
-                                </h6>
-                            </div>
-                            <div class="card-body"><canvas id="diameter-deviation-chart" height="200"></canvas></div>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="card">
                     <div class="card-header">
                         <h6 class="mb-0 d-flex align-items-center gap-2">
@@ -200,6 +204,44 @@
 
             <!-- General Stats Panel -->
             <div class="tab-pane fade" id="panel-general" role="tabpanel">
+                <!-- Charts first -->
+                <div class="row g-4 mb-4">
+                    <div class="col-lg-6">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h6 class="mb-0 d-flex align-items-center gap-2">
+                                    <i class="bi bi-pie-chart-fill text-danger"></i> Распределение по уровням важности
+                                </h6>
+                            </div>
+                            <div class="card-body d-flex align-items-center justify-content-center"><canvas id="severity-pie-chart" height="280"></canvas></div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h6 class="mb-0 d-flex align-items-center gap-2">
+                                    <i class="bi bi-bar-chart-fill text-primary"></i> События по сценариям
+                                </h6>
+                            </div>
+                            <div class="card-body d-flex align-items-center justify-content-center"><canvas id="scenario-bar-chart" height="280"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4 mb-4">
+                    <div class="col-12">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h6 class="mb-0 d-flex align-items-center gap-2">
+                                    <i class="bi bi-graph-up text-success"></i> Активность за последние 7 дней
+                                </h6>
+                            </div>
+                            <div class="card-body"><canvas id="activity-line-chart" height="280"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summary cards -->
                 <div class="row g-4 mb-4">
                     <div class="col-xl-3 col-md-6">
                         <div class="card stat-card h-100">
@@ -243,42 +285,6 @@
                                 <div class="stat-value fs-1" id="avg-duration">0 мин</div>
                                 <div class="stat-label">Средняя длительность</div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row g-4 mb-4">
-                    <div class="col-lg-6">
-                        <div class="card h-100">
-                            <div class="card-header">
-                                <h6 class="mb-0 d-flex align-items-center gap-2">
-                                    <i class="bi bi-pie-chart-fill text-danger"></i> Распределение по уровням важности
-                                </h6>
-                            </div>
-                            <div class="card-body d-flex align-items-center justify-content-center"><canvas id="severity-pie-chart" height="280"></canvas></div>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="card h-100">
-                            <div class="card-header">
-                                <h6 class="mb-0 d-flex align-items-center gap-2">
-                                    <i class="bi bi-bar-chart-fill text-primary"></i> События по сценариям
-                                </h6>
-                            </div>
-                            <div class="card-body d-flex align-items-center justify-content-center"><canvas id="scenario-bar-chart" height="280"></canvas></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row g-4 mb-4">
-                    <div class="col-12">
-                        <div class="card h-100">
-                            <div class="card-header">
-                                <h6 class="mb-0 d-flex align-items-center gap-2">
-                                    <i class="bi bi-graph-up text-success"></i> Активность за последние 7 дней
-                                </h6>
-                            </div>
-                            <div class="card-body"><canvas id="activity-line-chart" height="280"></canvas></div>
                         </div>
                     </div>
                 </div>

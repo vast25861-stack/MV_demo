@@ -58,6 +58,7 @@ function loadScenario(name) {
     STATE.nextEventIndex = 0;
 
     $('scenario-badge').textContent = name;
+    $('scenario-title').textContent = name.toUpperCase();
     $('modal-scenario-select').value = name;
     return true;
 }
