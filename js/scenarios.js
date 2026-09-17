@@ -26,5 +26,19 @@ const SCENARIOS = {
             { time: '0:10', message: 'Объект покидает зону проверки', zone: 'Камера 1', severity: 'info', type: 'event' },
             { time: '0:17', message: 'Следующий цикл', zone: 'Камера 1', severity: 'info', type: 'event' }
         ]
+    },
+    registered: {
+        name: 'registered',
+        video: 'video/Registered.webm',
+        events: [
+            { time: '0:04', message: 'Начало цикла', zone: 'Камера 1', severity: 'info', type: 'event' },
+            { time: '0:05', message: 'Обнаружение объектов', zone: 'Камера 1', severity: 'info', type: 'event' },
+            { time: '0:07', message: 'Обнаружено 4 объекта типа 1', zone: 'Камера 1', severity: 'success', type: 'event' },
+            { time: '0:10', message: 'Конец цикла', zone: 'Камера 1', severity: 'info', type: 'event' },
+            { time: '0:15', message: 'Начало цикла', zone: 'Камера 1', severity: 'info', type: 'event' },
+            { time: '0:17', message: 'Обнаружение объектов', zone: 'Камера 1', severity: 'info', type: 'event' },
+            { time: '0:20', message: 'Обнаружено 4 объекта типа 20', zone: 'Камера 1', severity: 'success', type: 'event' },
+            { time: '0:25', message: 'Конец цикла', zone: 'Камера 1', severity: 'info', type: 'event' }
+        ]
     }
 };
