@@ -3,17 +3,13 @@
 
 const STATE = {
     monitoringActive: false,
-    monitoringPaused: false,
-    startTime: null,
-    scenarioStartTime: null,
     currentScenario: 'behavior',
     scenarioEvents: [],
     nextEventIndex: 0,
+    scenarioStartTime: null,
     events: [],
     alerts: [],
-    stats: { fps: 0, gpu: 0, peopleCount: 0, incidentCount: 0, clipsCount: 0, zoneViolations: 0 },
-    scenarioTimerId: null,
-    statsTimerId: null
+    scenarioTimerId: null
 };
 
 const $ = (sel) => document.getElementById(sel);
@@ -21,22 +17,16 @@ const $ = (sel) => document.getElementById(sel);
 const video = $('video-player');
 const videoPlaceholder = $('video-placeholder');
 const els = {
-    btnStart: $('btn-start'),
-    btnPauseMon: $('btn-pause-monitoring'),
-    btnStopMon: $('btn-stop-monitoring'),
     videoSeek: $('video-seek'),
     videoTime: $('video-time'),
-    status: $('monitoring-status'),
+    videoStatus: $('video-status-badge'),
+    categoryTitle: $('category-title'),
+    categoryTools: $('category-tools'),
+    autoLoadVideo: $('auto-load-video'),
     eventsEmpty: $('events-empty'),
     alertsEmpty: $('alerts-empty'),
     eventsBody: document.querySelector('#events-table tbody'),
     alertsBody: document.querySelector('#alerts-table tbody'),
-    statFps: $('stat-fps'),
-    statGpu: $('stat-gpu'),
-    statPeople: $('stat-people'),
-    statIncidents: $('stat-incidents'),
-    statClips: $('stat-clips'),
-    statZones: $('stat-zones'),
 };
 
 function formatTime(s) {
@@ -60,7 +50,21 @@ function loadScenario(name) {
     $('scenario-badge').textContent = name;
     $('scenario-title').textContent = name.toUpperCase();
     $('modal-scenario-select').value = name;
+    renderCategoryTools(sc);
     return true;
+}
+
+// Category block shows the rest of the tools of the selected scenario's category.
+function renderCategoryTools(sc) {
+    const tools = (sc.categoryTools || []).filter(t => t !== sc.currentTool);
+
+    els.categoryTitle.textContent = sc.categoryName
+        ? `Возможности категории «${sc.categoryName}»`
+        : 'Другие задачи этой категории';
+
+    els.categoryTools.innerHTML = tools.length
+        ? tools.map(t => `<li><i class="bi bi-check-circle-fill"></i><span>${t}</span></li>`).join('')
+        : '<li class="category-tools-empty">Другие задачи категории не заданы</li>';
 }
 
 function addEvent(data) {
@@ -75,43 +79,18 @@ function addAlert(data) {
     renderAlertsTable();
 }
 
-function renderRow(e) {
-    return `<tr class="new-row"><td>${e.timestamp}</td><td>${e.text}</td><td>${e.sub || '-'}</td><td><span class="badge severity-${e.sev} severity-badge">${e.sev}</span></td></tr>`;
-}
-
 function renderEventsTable() {
     els.eventsBody.innerHTML = STATE.events.map((e, i) =>
         `<tr${i === 0 ? ' class="new-row"' : ''}><td>${e.timestamp}</td><td>${e.message || e.type}</td><td>${e.zone || '-'}</td><td><span class="badge severity-${e.severity} severity-badge">${e.severity}</span></td></tr>`
     ).join('');
-    els.eventsEmpty.style.display = STATE.events.length ? 'none' : 'block';
+    els.eventsEmpty.classList.toggle('empty-hidden', STATE.events.length > 0);
 }
 
 function renderAlertsTable() {
     els.alertsBody.innerHTML = STATE.alerts.map((a, i) =>
         `<tr${i === 0 ? ' class="new-row"' : ''}><td>${a.timestamp}</td><td>${a.type || a.message}</td><td>${a.details || a.zone || '-'}</td><td><span class="badge severity-${a.status || a.severity} severity-badge">${a.status || a.severity}</span></td></tr>`
     ).join('');
-    els.alertsEmpty.style.display = STATE.alerts.length ? 'none' : 'block';
-}
-
-function updateStats() {
-    const active = STATE.monitoringActive && !STATE.monitoringPaused;
-    const s = STATE.stats;
-    if (active) {
-        s.fps = (Math.random() * 16 + 15) | 0;
-        s.gpu = (Math.random() * 46 + 40) | 0;
-        s.peopleCount = (Math.random() * 4 + 1) | 0;
-        s.incidentCount = (Math.random() * 3) | 0;
-        s.clipsCount = (Math.random() * 11) | 0;
-        s.zoneViolations = (Math.random() * 3) | 0;
-    } else {
-        s.fps = s.gpu = s.peopleCount = s.incidentCount = s.clipsCount = s.zoneViolations = 0;
-    }
-    els.statFps.textContent = s.fps;
-    els.statGpu.textContent = s.gpu + '%';
-    els.statPeople.textContent = s.peopleCount;
-    els.statIncidents.textContent = s.incidentCount;
-    els.statClips.textContent = s.clipsCount;
-    els.statZones.textContent = s.zoneViolations;
+    els.alertsEmpty.classList.toggle('empty-hidden', STATE.alerts.length > 0);
 }
 
 function updateVideoTime() {
@@ -122,7 +101,7 @@ function updateVideoTime() {
 }
 
 function checkScenarioEvents() {
-    if (!STATE.monitoringActive || STATE.monitoringPaused) return;
+    if (!STATE.monitoringActive) return;
 
     const elapsed = (Date.now() - STATE.scenarioStartTime) / 1000;
     const events = STATE.scenarioEvents;
@@ -143,17 +122,12 @@ function checkScenarioEvents() {
 }
 
 function startTimers() {
-    if (STATE.statsTimerId) clearInterval(STATE.statsTimerId);
     if (STATE.scenarioTimerId) clearInterval(STATE.scenarioTimerId);
-    STATE.statsTimerId = setInterval(updateStats, 1000);
     STATE.scenarioTimerId = setInterval(checkScenarioEvents, 500);
-    updateStats();
 }
 
 function clearTimers() {
-    clearInterval(STATE.statsTimerId);
     clearInterval(STATE.scenarioTimerId);
-    STATE.statsTimerId = null;
     STATE.scenarioTimerId = null;
 }
 
@@ -161,71 +135,42 @@ function setPlaceholderVisible(visible) {
     videoPlaceholder.style.setProperty('display', visible ? 'flex' : 'none', 'important');
 }
 
-function updateUIState() {
-    const { monitoringActive: a, monitoringPaused: p } = STATE;
-
-    els.btnStart.disabled = a;
-    els.btnPauseMon.disabled = !a || p;
-    els.btnStopMon.disabled = !a;
-
-    const statusMap = [
-        [false, 'bg-secondary', 'Остановлен'],
-        [true, 'bg-warning text-dark', 'Приостановлен'],
-        [true, 'bg-success', 'Активен']
-    ];
-    const [, cls, text] = statusMap[a ? (p ? 1 : 2) : 0];
-    els.status.innerHTML = `Статус: <span class="badge ${cls}">${text}</span>`;
+function setVideoStatus(text, cls = 'bg-primary') {
+    els.videoStatus.className = `badge px-3 py-2 ${cls}`;
+    els.videoStatus.innerHTML = `<span class="animate-pulse me-1">●</span> ${text}`;
 }
 
 function startMonitoring() {
     if (STATE.monitoringActive) return;
 
     const scenario = SCENARIOS[STATE.currentScenario];
-    const videoSrc = scenario ? scenario.video : 'video/1.webm';
+    if (!scenario) return;
 
     STATE.monitoringActive = true;
-    STATE.monitoringPaused = false;
     STATE.nextEventIndex = 0;
     STATE.scenarioEvents.forEach(e => e.fired = false);
-    STATE.startTime = Date.now();
     STATE.scenarioStartTime = Date.now();
 
     setPlaceholderVisible(false);
     els.videoSeek.style.display = 'block';
-    updateUIState();
+    setVideoStatus('Загрузка', 'bg-primary');
 
-    video.src = videoSrc;
+    // muted keeps play() allowed by browser autoplay policies.
+    video.muted = true;
+    video.src = scenario.video;
     video.load();
 
-    video.oncanplay = function () {
-        video.oncanplay = null;
-        video.play().then(startTimers).catch(err => console.error('Play error:', err));
-    };
-}
-
-function pauseMonitoring() {
-    if (!STATE.monitoringActive || STATE.monitoringPaused) return;
-    STATE.monitoringPaused = true;
-    video.pause();
-    updateUIState();
-}
-
-function resumeMonitoring() {
-    if (!STATE.monitoringActive || !STATE.monitoringPaused) return;
-    STATE.monitoringPaused = false;
-
-    const nextEvt = STATE.scenarioEvents[STATE.nextEventIndex];
-    if (nextEvt) {
-        STATE.scenarioStartTime = Date.now() - nextEvt.timeSeconds * 1000;
-    }
-
-    video.play().catch(err => console.error('Resume failed:', err));
-    updateUIState();
+    video.addEventListener('loadedmetadata', function onMetadata() {
+        video.removeEventListener('loadedmetadata', onMetadata);
+        video.play().then(() => startTimers()).catch(err => {
+            console.error('Play error:', err);
+            setVideoStatus('Ожидание', 'bg-primary');
+        });
+    });
 }
 
 function stopMonitoring() {
     STATE.monitoringActive = false;
-    STATE.monitoringPaused = false;
 
     video.pause();
     video.currentTime = 0;
@@ -233,28 +178,21 @@ function stopMonitoring() {
     els.videoSeek.style.display = 'none';
 
     clearTimers();
-    updateUIState();
-    updateStats();
+    setVideoStatus('Ожидание', 'bg-primary');
     updateVideoTime();
 }
 
 function applyScenario(name) {
-    const wasActive = STATE.monitoringActive;
-    if (wasActive) stopMonitoring();
-
     loadScenario(name);
 
     const modal = bootstrap.Modal.getInstance($('scenarioModal'));
     if (modal) modal.hide();
 
-    if (wasActive) setTimeout(startMonitoring, 300);
+    stopMonitoring();
+    if (els.autoLoadVideo.checked) setTimeout(startMonitoring, 300);
 }
 
 function initEventListeners() {
-    els.btnStart.addEventListener('click', startMonitoring);
-    els.btnPauseMon.addEventListener('click', pauseMonitoring);
-    els.btnStopMon.addEventListener('click', stopMonitoring);
-
     $('btn-clear-events').addEventListener('click', () => { STATE.events = []; renderEventsTable(); });
     $('btn-clear-alerts').addEventListener('click', () => { STATE.alerts = []; renderAlertsTable(); });
 
@@ -263,12 +201,15 @@ function initEventListeners() {
 
     video.addEventListener('timeupdate', () => {
         updateVideoTime();
-        if (STATE.monitoringActive && !STATE.monitoringPaused &&
-            video.duration && video.currentTime >= video.duration - 0.5) {
+        if (STATE.monitoringActive && video.duration && video.currentTime >= video.duration - 0.5) {
             stopMonitoring();
         }
     });
 
+    video.addEventListener('play', () => setVideoStatus('Воспроизведение', 'bg-success'));
+    video.addEventListener('pause', () => {
+        if (STATE.monitoringActive) setVideoStatus('Пауза', 'bg-warning text-dark');
+    });
     video.addEventListener('ended', () => { if (STATE.monitoringActive) stopMonitoring(); });
     video.addEventListener('error', () => console.error('Video error:', video.error));
     els.videoSeek.addEventListener('input', e => { video.currentTime = e.target.value; });
@@ -277,9 +218,11 @@ function initEventListeners() {
 function init() {
     loadScenario('ocr');
     initEventListeners();
-    updateUIState();
     renderEventsTable();
     renderAlertsTable();
+
+    // No manual controls anymore: the demo clip starts on its own.
+    if (els.autoLoadVideo.checked) startMonitoring();
 }
 
 document.addEventListener('DOMContentLoaded', init);
