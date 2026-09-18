@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boiler Safety Monitor — Отчёты</title>
+    <title>Аналитические отчёты</title>
     <link href="lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="lib/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
@@ -19,7 +19,7 @@
                 <div class="rounded-lg bg-gradient d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary), var(--info));">
                     <i class="bi bi-shield-check text-white fs-4"></i>
                 </div>
-                <span class="fw-bold fs-4 text-dark d-none d-md-inline">Boiler Safety Monitor</span>
+                <span class="fw-bold fs-4 text-dark d-none d-md-inline">Аналитические отчёты</span>
             </a>
             <div class="ms-auto d-flex align-items-center gap-3">
                 <a href="index.html" class="btn btn-outline-primary btn-sm d-none d-lg-inline-flex align-items-center gap-2" style="border-radius: var(--radius); padding: 0.5rem 1rem;">
@@ -56,6 +56,11 @@
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="tab-diameter" data-bs-toggle="tab" data-bs-target="#panel-diameter" type="button" role="tab">
                     <i class="bi bi-rulers me-1"></i> Diameter — Измерение диаметра
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="tab-registered" data-bs-toggle="tab" data-bs-target="#panel-registered" type="button" role="tab">
+                    <i class="bi bi-list-ol me-1"></i> Registered — Подсчёт объектов
                 </button>
             </li>
             <li class="nav-item" role="presentation">
@@ -199,6 +204,74 @@
                         </h6>
                     </div>
                     <div class="card-body" id="diameter-timeline"></div>
+                </div>
+            </div>
+
+            <!-- Registered Panel -->
+            <div class="tab-pane fade" id="panel-registered" role="tabpanel">
+                <!-- Charts first -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h6 class="mb-0 d-flex align-items-center gap-2">
+                                    <i class="bi bi-bar-chart-steps text-primary"></i> Подсчёт объектов по циклам
+                                </h6>
+                            </div>
+                            <div class="card-body"><canvas id="registered-count-chart" height="200"></canvas></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h6 class="mb-0 d-flex align-items-center gap-2">
+                                    <i class="bi bi-pie-chart text-warning"></i> Результат подсчёта
+                                </h6>
+                            </div>
+                            <div class="card-body"><canvas id="registered-status-chart" height="200"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats and Events table -->
+                <div class="row g-4 mb-4">
+                    <div class="col-xl-8 col-lg-7">
+                        <div class="card h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0 d-flex align-items-center gap-2">
+                                    <i class="bi bi-list-check text-info"></i> События за период
+                                </h6>
+                                <span class="badge bg-info px-3 py-2">16 записей</span>
+                            </div>
+                            <div class="card-body p-0" style="max-height: 450px; overflow-y: auto;">
+                                <table class="table table-sm table-hover mb-0" id="registered-events-table">
+                                    <thead class="sticky-top">
+                                        <tr><th>Дата/Время</th><th>Событие</th><th>Зона</th><th>Уровень</th></tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-lg-5">
+                        <div class="card h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0 d-flex align-items-center gap-2">
+                                    <i class="bi bi-graph-up text-success"></i> Статистика подсчёта
+                                </h6>
+                            </div>
+                            <div class="card-body" id="registered-stats"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0 d-flex align-items-center gap-2">
+                            <i class="bi bi-clock-history text-purple" style="--purple: #8b5cf6;"></i> Хронология событий
+                        </h6>
+                    </div>
+                    <div class="card-body" id="registered-timeline"></div>
                 </div>
             </div>
 

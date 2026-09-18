@@ -12,12 +12,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
     <style>
-        /* Layout fix: make main fill viewport minus navbar */
+        /* Layout fix: make main fill viewport minus navbar and page header */
         main {
-            min-height: calc(100vh - 64px);
+            min-height: calc(100vh - 64px - 60px);
         }
         .main-row {
-            height: calc(100vh - 64px - 2rem); /* minus navbar and padding */
+            height: calc(100vh - 64px - 60px - 2rem); /* minus navbar, page header and padding */
         }
         .video-card {
             height: 100%;
@@ -39,7 +39,7 @@
         @media (max-width: 1199px) {
             .main-row {
                 height: auto;
-                min-height: calc(100vh - 64px - 2rem);
+                min-height: calc(100vh - 64px - 60px - 2rem);
             }
             .video-card {
                 max-height: 60vh;
@@ -56,9 +56,15 @@
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light sticky-top" style="height: 64px;">
+    <header class="page-header">
         <div class="container-fluid px-4">
-            <a href="https://vdt-vision.tilda.ws/" class="navbar-brand text-decoration-none d-flex align-items-center" target="_blank" rel="noopener" title="Назад" style="padding: 0.375rem 0.875rem; border-radius: var(--radius); border: 1px solid var(--border-color); color: var(--text-secondary); font-size: 0.95rem; font-weight: 600; transition: all var(--transition);" onmouseover="this.style.background='var(--bg-tertiary)'" onmouseout="this.style.background='transparent'">Назад</a>
+            <h1>Демо ролики задач машинного зрения</h1>
+        </div>
+    </header>
+
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container-fluid px-4">
+            <a href="https://vdt-vision.tilda.ws/" class="navbar-brand text-decoration-none d-flex align-items-center" target="_blank" rel="noopener" title="Назад" style="padding: 0.375rem 0.875rem; border-radius: var(--radius); border: 1px solid var(--vdt-border); color: var(--vdt-text-secondary); font-size: 0.95rem; font-weight: 600; transition: all var(--transition);" onmouseover="this.style.background='var(--vdt-bg-tertiary)'" onmouseout="this.style.background='transparent'">Назад</a>
             <div class="ms-3 d-flex align-items-center gap-2">
                 <span class="text-muted small d-none d-md-inline">Выберите задачу для демо ролика:</span>
                 <span class="badge bg-secondary px-3 py-2 fs-6" id="scenario-badge" role="button" data-bs-toggle="tooltip" title="Клик для выбора сценария" style="cursor: pointer;">OCR</span>
@@ -84,7 +90,7 @@
                             <span id="scenario-title">OCR</span>
                         </h5>
                         <div class="d-flex align-items-center gap-2">
-                            <span class="badge bg-primary px-3 py-2" id="video-status-badge">
+                            <span class="badge bg-secondary px-3 py-2" id="video-status-badge">
                                 <span class="animate-pulse me-1">●</span> Ожидание
                             </span>
                         </div>
@@ -92,7 +98,7 @@
                     <div class="video-area flex-shrink-0">
                         <div class="video-player-wrapper position-relative w-100" style="aspect-ratio: 16/9;">
                             <video id="video-player" playsinline muted preload="metadata" style="width:100%; height:100%; object-fit:contain; display:block;"></video>
-                            <div id="video-placeholder" class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center text-white" style="z-index:2; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);">
+                            <div id="video-placeholder" class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center text-white" style="z-index:2; background: linear-gradient(135deg, var(--vdt-text) 0%, var(--vdt-text-secondary) 100%);">
                                 <div class="rounded-circle bg-white/10 p-4 mb-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
                                     <i class="bi bi-camera-video fs-1 text-white/70"></i>
                                 </div>
@@ -124,7 +130,7 @@
                     <div class="card mb-2 animate-fade-in" style="animation-delay: 50ms;">
                         <div class="card-header py-2">
                             <h6 class="mb-0 d-flex align-items-center gap-2 small">
-                                <i class="bi bi-collection text-primary"></i>
+                                <i class="bi bi-collection text-secondary"></i>
                                 <span id="category-title">Возможности категории</span>
                             </h6>
                         </div>
@@ -137,7 +143,7 @@
                     <div class="card mb-2 animate-fade-in flex-grow-1" style="animation-delay: 100ms; min-height: 0;">
                         <div class="card-header py-2">
                             <h6 class="mb-0 d-flex align-items-center gap-2 small">
-                                <i class="bi bi-list-ul text-info"></i> События
+                                <i class="bi bi-list-ul text-secondary"></i> События
                             </h6>
                             <button class="btn btn-sm btn-outline-secondary rounded-pill" id="btn-clear-events" title="Очистить" style="padding: 0.2rem 0.5rem;">
                                 <i class="bi bi-trash fs-6"></i>
@@ -161,7 +167,7 @@
                     <div class="card animate-fade-in flex-grow-1" style="animation-delay: 200ms; min-height: 0;">
                         <div class="card-header py-2">
                             <h6 class="mb-0 d-flex align-items-center gap-2 small">
-                                <i class="bi bi-bell-fill text-warning"></i> Уведомления
+                                <i class="bi bi-bell-fill text-secondary"></i> Уведомления
                             </h6>
                             <button class="btn btn-sm btn-outline-secondary rounded-pill" id="btn-clear-alerts" title="Очистить" style="padding: 0.2rem 0.5rem;">
                                 <i class="bi bi-trash fs-6"></i>
@@ -191,7 +197,7 @@
             <div class="modal-content">
                 <div class="modal-header border-0 pb-0">
                     <h5 class="modal-title fw-bold d-flex align-items-center gap-2">
-                        <i class="bi bi-diagram-3 text-primary"></i> Выбор сценария
+                        <i class="bi bi-diagram-3 text-secondary"></i> Выбор сценария
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>

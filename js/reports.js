@@ -72,6 +72,41 @@ const REPORT_DATA = {
         diameter1History: [10.01, 10.03, 9.99, 10.02, 10.04, 10.00, 10.02, 10.01, 10.03, 10.02],
         diameter2History: [22.01, 21.99, 21.98, 22.02, 21.97, 22.00, 21.99, 22.01, 21.98, 21.99],
         deviationHistory: [0.01, -0.01, 0.02, -0.02, 0.03, 0.00, 0.01, -0.01, 0.02, -0.01]
+    },
+    registered: {
+        name: 'Registered — Подсчёт объектов',
+        sessions: 21,
+        totalEvents: 124,
+        alerts: 5,
+        avgDuration: 28,
+        lastRun: '2025-09-16 15:08',
+        events: [
+            { time: '2025-09-16 15:06:40', message: 'Начало цикла', zone: 'Камера 1', severity: 'info' },
+            { time: '2025-09-16 15:06:41', message: 'Обнаружение объектов', zone: 'Камера 1', severity: 'info' },
+            { time: '2025-09-16 15:06:44', message: 'Обнаружено 4 объекта типа 1', zone: 'Камера 1', severity: 'success' },
+            { time: '2025-09-16 15:06:47', message: 'Конец цикла', zone: 'Камера 1', severity: 'info' },
+            { time: '2025-09-16 15:06:52', message: 'Начало цикла', zone: 'Камера 1', severity: 'info' },
+            { time: '2025-09-16 15:01:30', message: 'Обнаружение объектов', zone: 'Камера 1', severity: 'info' },
+            { time: '2025-09-16 15:01:33', message: 'Обнаружено 4 объекта типа 20', zone: 'Камера 1', severity: 'success' },
+            { time: '2025-09-16 15:01:38', message: 'Конец цикла', zone: 'Камера 1', severity: 'info' },
+            { time: '2025-09-16 15:01:40', message: 'Начало цикла', zone: 'Камера 1', severity: 'info' },
+            { time: '2025-09-16 15:01:43', message: 'Обнаружение объектов', zone: 'Камера 1', severity: 'info' },
+            { time: '2025-09-16 15:01:46', message: 'Рассхождение с ожидаемым количеством (ожидалось 5)', zone: 'Камера 1', severity: 'warning' },
+            { time: '2025-09-16 14:56:20', message: 'Начало цикла', zone: 'Камера 1', severity: 'info' },
+            { time: '2025-09-16 14:56:23', message: 'Обнаружение объектов', zone: 'Камера 1', severity: 'info' },
+            { time: '2025-09-16 14:56:26', message: 'Обнаружено 6 объектов типа 1', zone: 'Камера 1', severity: 'success' },
+            { time: '2025-09-16 14:56:30', message: 'Объекты пересекли линию подсчёта', zone: 'Камера 1', severity: 'info' },
+            { time: '2025-09-16 14:56:34', message: 'Конец цикла', zone: 'Камера 1', severity: 'info' },
+        ],
+        stats: {
+            counted: 112,
+            mismatched: 6,
+            avgCount: 4.4,
+            uniqueTypes: 8,
+            cyclesPerHour: 52,
+        },
+        countHistory: [4, 4, 6, 4, 5, 4, 3, 4, 5, 4],
+        statusCounts: { success: 104, info: 12, warning: 6, danger: 2 }
     }
 };
 
@@ -127,7 +162,7 @@ function renderStats(scenarioKey) {
                 <div class="col-6"><div class="fw-bold fs-4 text-warning">${stats.cyclesPerHour}</div><small class="text-muted">Циклов/час</small></div>
             </div>
         `;
-    } else {
+    } else if (scenarioKey === 'diameter') {
         container.innerHTML = `
             <div class="row g-2 text-center">
                 <div class="col-6"><div class="fw-bold fs-4 text-success">${stats.measured}</div><small class="text-muted">Измерено объектов</small></div>
@@ -135,6 +170,16 @@ function renderStats(scenarioKey) {
                 <div class="col-6"><div class="fw-bold fs-4 text-primary">${stats.avgDiameter1} mm</div><small class="text-muted">Ср. D1 (10 mm)</small></div>
                 <div class="col-6"><div class="fw-bold fs-4 text-info">${stats.avgDiameter2} mm</div><small class="text-muted">Ср. D2 (22 mm)</small></div>
                 <div class="col-6"><div class="fw-bold fs-4 text-warning">${stats.precision} mm</div><small class="text-muted">Точность</small></div>
+            </div>
+        `;
+    } else {
+        container.innerHTML = `
+            <div class="row g-2 text-center">
+                <div class="col-6"><div class="fw-bold fs-4 text-success">${stats.counted}</div><small class="text-muted">Посчитано объектов</small></div>
+                <div class="col-6"><div class="fw-bold fs-4 text-danger">${stats.mismatched}</div><small class="text-muted">Расхождений</small></div>
+                <div class="col-6"><div class="fw-bold fs-4 text-primary">${stats.avgCount}</div><small class="text-muted">Ср. за цикл</small></div>
+                <div class="col-6"><div class="fw-bold fs-4 text-info">${stats.uniqueTypes}</div><small class="text-muted">Уникальных типов</small></div>
+                <div class="col-6"><div class="fw-bold fs-4 text-warning">${stats.cyclesPerHour}</div><small class="text-muted">Циклов/час</small></div>
             </div>
         `;
     }
@@ -162,13 +207,19 @@ function renderTimeline(scenarioKey) {
     `).join('');
 }
 
+const SCENARIO_META = {
+    ocr: { label: 'OCR', badge: 'bg-secondary', color: '#6c757d' },
+    diameter: { label: 'Diameter', badge: 'bg-primary', color: '#0d6efd' },
+    registered: { label: 'Registered', badge: 'bg-success', color: '#198754' }
+};
+
 function renderGeneralStats() {
-    const ocr = REPORT_DATA.ocr;
-    const dia = REPORT_DATA.diameter;
-    const totalEvents = ocr.totalEvents + dia.totalEvents;
-    const totalSessions = ocr.sessions + dia.sessions;
-    const totalAlerts = ocr.alerts + dia.alerts;
-    const avgDuration = Math.round((ocr.avgDuration * ocr.sessions + dia.avgDuration * dia.sessions) / totalSessions);
+    const entries = Object.entries(REPORT_DATA);
+    const totalEvents = entries.reduce((sum, [, d]) => sum + d.totalEvents, 0);
+    const totalSessions = entries.reduce((sum, [, d]) => sum + d.sessions, 0);
+    const totalAlerts = entries.reduce((sum, [, d]) => sum + d.alerts, 0);
+    const weightedDuration = entries.reduce((sum, [, d]) => sum + d.avgDuration * d.sessions, 0);
+    const avgDuration = Math.round(weightedDuration / totalSessions);
 
     document.getElementById('total-events').textContent = totalEvents;
     document.getElementById('total-sessions').textContent = totalSessions;
@@ -177,23 +228,16 @@ function renderGeneralStats() {
 
     // Summary table
     const tbody = document.querySelector('#summary-table tbody');
-    tbody.innerHTML = `
+    tbody.innerHTML = entries.map(([key, d]) => `
         <tr>
-            <td><span class="badge bg-secondary">OCR</span></td>
-            <td>${ocr.totalEvents}</td>
-            <td>${ocr.alerts}</td>
-            <td>${ocr.sessions}</td>
-            <td>${ocr.avgDuration} мин</td>
-            <td>${ocr.lastRun}</td>
+            <td><span class="badge ${SCENARIO_META[key].badge}">${SCENARIO_META[key].label}</span></td>
+            <td>${d.totalEvents}</td>
+            <td>${d.alerts}</td>
+            <td>${d.sessions}</td>
+            <td>${d.avgDuration} мин</td>
+            <td>${d.lastRun}</td>
         </tr>
-        <tr>
-            <td><span class="badge bg-primary">Diameter</span></td>
-            <td>${dia.totalEvents}</td>
-            <td>${dia.alerts}</td>
-            <td>${dia.sessions}</td>
-            <td>${dia.avgDuration} мин</td>
-            <td>${dia.lastRun}</td>
-        </tr>
+    `).join('') + `
         <tr class="table-active fw-bold">
             <td>Итого</td>
             <td>${totalEvents}</td>
@@ -205,9 +249,8 @@ function renderGeneralStats() {
     `;
 
     // Severity counts
-    const allEvents = [...ocr.events, ...dia.events];
     const counts = { danger: 0, warning: 0, info: 0, success: 0 };
-    allEvents.forEach(e => counts[e.severity] = (counts[e.severity] || 0) + 1);
+    entries.forEach(([, d]) => d.events.forEach(e => counts[e.severity] = (counts[e.severity] || 0) + 1));
     document.getElementById('cnt-danger').textContent = counts.danger;
     document.getElementById('cnt-warning').textContent = counts.warning;
     document.getElementById('cnt-info').textContent = counts.info;
@@ -268,6 +311,7 @@ const charts = {};
 function renderCharts() {
     renderOcrCharts();
     renderDiameterCharts();
+    renderRegisteredCharts();
     renderGeneralCharts();
 }
 
@@ -388,10 +432,57 @@ function renderDiameterCharts() {
     }
 }
 
+function renderRegisteredCharts() {
+    const ctx1 = document.getElementById('registered-count-chart');
+    if (ctx1 && !charts.regCount) {
+        charts.regCount = new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: REPORT_DATA.registered.countHistory.map((_, i) => `Цикл ${i+1}`),
+                datasets: [{
+                    label: 'Посчитано объектов',
+                    data: REPORT_DATA.registered.countHistory,
+                    backgroundColor: 'rgba(25, 135, 84, 0.7)',
+                    borderColor: '#198754',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+            }
+        });
+    }
+
+    const ctx2 = document.getElementById('registered-status-chart');
+    if (ctx2 && !charts.regStatus) {
+        const s = REPORT_DATA.registered.statusCounts;
+        charts.regStatus = new Chart(ctx2, {
+            type: 'doughnut',
+            data: {
+                labels: ['Совпало', 'Инфо', 'Расхождение', 'Ошибка'],
+                datasets: [{
+                    data: [s.success, s.info, s.warning, s.danger],
+                    backgroundColor: ['#198754', '#0dcaf0', '#ffc107', '#dc3545'],
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom' } }
+            }
+        });
+    }
+}
+
 function renderGeneralCharts() {
     // Severity pie
     const ctx1 = document.getElementById('severity-pie-chart');
-    const allEvents = [...REPORT_DATA.ocr.events, ...REPORT_DATA.diameter.events];
+    const allEvents = Object.values(REPORT_DATA).flatMap(d => d.events);
     const counts = { danger: 0, warning: 0, info: 0, success: 0 };
     allEvents.forEach(e => counts[e.severity] = (counts[e.severity] || 0) + 1);
 
@@ -418,24 +509,25 @@ function renderGeneralCharts() {
     // Scenario bar
     const ctx2 = document.getElementById('scenario-bar-chart');
     if (ctx2 && !charts.scenarioBar) {
+        const keys = Object.keys(REPORT_DATA);
         charts.scenarioBar = new Chart(ctx2, {
             type: 'bar',
             data: {
-                labels: ['OCR', 'Diameter'],
+                labels: keys.map(k => SCENARIO_META[k].label),
                 datasets: [{
                     label: 'Событий',
-                    data: [REPORT_DATA.ocr.totalEvents, REPORT_DATA.diameter.totalEvents],
-                    backgroundColor: ['#6c757d', '#0d6efd'],
+                    data: keys.map(k => REPORT_DATA[k].totalEvents),
+                    backgroundColor: keys.map(k => SCENARIO_META[k].color),
                     borderWidth: 1
                 }, {
                     label: 'Уведомлений',
-                    data: [REPORT_DATA.ocr.alerts, REPORT_DATA.diameter.alerts],
-                    backgroundColor: ['#dc3545', '#dc3545'],
+                    data: keys.map(k => REPORT_DATA[k].alerts),
+                    backgroundColor: '#dc3545',
                     borderWidth: 1
                 }, {
                     label: 'Сессий',
-                    data: [REPORT_DATA.ocr.sessions, REPORT_DATA.diameter.sessions],
-                    backgroundColor: ['#198754', '#198754'],
+                    data: keys.map(k => REPORT_DATA[k].sessions),
+                    backgroundColor: '#198754',
                     borderWidth: 1
                 }]
             },
@@ -453,6 +545,7 @@ function renderGeneralCharts() {
     const days = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
     const ocrDaily = [18, 22, 15, 25, 20, 12, 8];
     const diaDaily = [10, 14, 8, 16, 12, 6, 4];
+    const regDaily = [14, 18, 12, 20, 16, 9, 5];
 
     if (ctx3 && !charts.activityLine) {
         charts.activityLine = new Chart(ctx3, {
@@ -477,10 +570,18 @@ function renderGeneralCharts() {
                         tension: 0.3
                     },
                     {
-                        label: 'Всего',
-                        data: ocrDaily.map((v, i) => v + diaDaily[i]),
+                        label: 'Registered',
+                        data: regDaily,
                         borderColor: '#198754',
                         backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                        fill: true,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'Всего',
+                        data: ocrDaily.map((v, i) => v + diaDaily[i] + regDaily[i]),
+                        borderColor: '#6f42c1',
+                        backgroundColor: 'rgba(111, 66, 193, 0.1)',
                         fill: true,
                         tension: 0.3,
                         borderDash: [5, 5]
@@ -500,12 +601,11 @@ function renderGeneralCharts() {
 // Init
 document.addEventListener('DOMContentLoaded', () => {
     renderSummaryCards();
-    renderEventsTable('ocr');
-    renderEventsTable('diameter');
-    renderStats('ocr');
-    renderStats('diameter');
-    renderTimeline('ocr');
-    renderTimeline('diameter');
+    Object.keys(REPORT_DATA).forEach(key => {
+        renderEventsTable(key);
+        renderStats(key);
+        renderTimeline(key);
+    });
     renderGeneralStats();
     renderCharts();
 });
