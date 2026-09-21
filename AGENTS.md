@@ -29,6 +29,9 @@ Opens `http://localhost:8080`. Server supports Range requests for video seeking.
   `diameter` (category 1 «Измерение»), `registered` (category 2 «Подсчёт»).
 - Each scenario carries `category`, `categoryName`, `currentTool`, `categoryTools`;
   the sidebar block «Возможности категории» lists the other tools of that category.
+- Hover hints in that block come from `TOOL_DESCRIPTIONS` / `CATEGORY_DESCRIPTIONS`
+  in `js/scenarios.js` (source: `Category Tools.xlsx`, currently only category 3 is filled);
+  they are Bootstrap tooltips, so `renderCategoryTools()` disposes and re-inits them on every re-render.
 - There are **no** Start/Pause/Stop controls and **no** stats tiles — video autoplays
   on load and after `applyScenario()` (muted, `loadedmetadata` → `play()`).
 - Events/messages are hardcoded in `js/scenarios.js` (no backend API).

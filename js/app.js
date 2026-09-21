@@ -39,32 +39,74 @@ function parseTime(t) {
     return p[0] * 60 + (p[1] || 0);
 }
 
+function escapeAttr(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// Bootstrap tooltips are opt-in: every element rendered later has to be picked up manually.
+// container: 'body' keeps hints from being clipped by the scrollable right panel.
+function initTooltips(scope) {
+    (scope || document).querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+        bootstrap.Tooltip.getOrCreateInstance(el, { container: 'body', html: true });
+    });
+}
+
+// innerHTML-based re-render drops the trigger nodes, so their popper must be released first.
+function disposeTooltips(scope) {
+    (scope || document).querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+        const tip = bootstrap.Tooltip.getInstance(el);
+        if (tip) tip.dispose();
+    });
+}
+
+// SCENARIOS keys are lowercase, while badge/select values may come in any case.
+function findScenario(name) {
+    if (!name) return null;
+    if (SCENARIOS[name]) return SCENARIOS[name];
+    const key = Object.keys(SCENARIOS).find(k => k.toLowerCase() === String(name).toLowerCase());
+    return key ? SCENARIOS[key] : null;
+}
+
 function loadScenario(name) {
-    const sc = SCENARIOS[name];
+    const sc = findScenario(name);
     if (!sc) return false;
 
-    STATE.currentScenario = name;
+    STATE.currentScenario = sc.name;
     STATE.scenarioEvents = sc.events.map(e => ({ ...e, timeSeconds: parseTime(e.time), fired: false }));
     STATE.nextEventIndex = 0;
 
-    $('scenario-badge').textContent = name;
-    $('scenario-title').textContent = name.toUpperCase();
-    $('modal-scenario-select').value = name;
+    $('scenario-badge').textContent = sc.name.toUpperCase();
+    $('scenario-title').textContent = sc.name.toUpperCase();
+    $('modal-scenario-select').value = sc.name;
     renderCategoryTools(sc);
     return true;
 }
 
 // Category block shows the rest of the tools of the selected scenario's category.
+// Hints for the category and each tool come from TOOL/CATEGORY_DESCRIPTIONS (see scenarios.js).
 function renderCategoryTools(sc) {
     const tools = (sc.categoryTools || []).filter(t => t !== sc.currentTool);
+    const categoryHint = (typeof CATEGORY_DESCRIPTIONS !== 'undefined' && CATEGORY_DESCRIPTIONS[sc.category]) || '';
 
-    els.categoryTitle.textContent = sc.categoryName
+    disposeTooltips(els.categoryTools);
+    disposeTooltips(els.categoryTitle.parentElement);
+
+    els.categoryTitle.innerHTML = (sc.categoryName
         ? `Возможности категории «${sc.categoryName}»`
-        : 'Другие задачи этой категории';
+        : 'Другие задачи этой категории')
+        + (categoryHint
+            ? ` <i class="bi bi-info-circle text-muted" data-bs-toggle="tooltip" title="${escapeAttr(categoryHint)}"></i>`
+            : '');
 
     els.categoryTools.innerHTML = tools.length
-        ? tools.map(t => `<li><i class="bi bi-check-circle-fill"></i><span>${t}</span></li>`).join('')
+        ? tools.map(t => {
+            const hint = (typeof TOOL_DESCRIPTIONS !== 'undefined' && TOOL_DESCRIPTIONS[t]) || '';
+            return `<li${hint ? ` data-bs-toggle="tooltip" title="${escapeAttr(hint)}"` : ''}><i class="bi bi-check-circle-fill"></i><span>${t}</span></li>`;
+        }).join('')
         : '<li class="category-tools-empty">Другие задачи категории не заданы</li>';
+
+    initTooltips(els.categoryTools);
+    initTooltips(els.categoryTitle.parentElement);
 }
 
 function addEvent(data) {
@@ -216,10 +258,11 @@ function initEventListeners() {
 }
 
 function init() {
-    loadScenario('ocr');
+    loadScenario('OCR');
     initEventListeners();
     renderEventsTable();
     renderAlertsTable();
+    initTooltips();
 
     // No manual controls anymore: the demo clip starts on its own.
     if (els.autoLoadVideo.checked) startMonitoring();

@@ -2,9 +2,10 @@
 """HTTP server with Range request support for video streaming."""
 import os
 import mimetypes
+import socket
 import urllib.parse
 import posixpath
-from http.server import HTTPServer, BaseHTTPRequestHandler
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 SERVE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -113,7 +114,46 @@ class VideoRequestHandler(BaseHTTPRequestHandler):
         super().log_message(format, *args)
 
 
+class VideoHTTPServer(ThreadingHTTPServer):
+    """Многопоточный сервер: видео с Range-запросами не блокирует отдачу страницы.
+
+    Браузер держит по несколько одновременных соединений на видео, поэтому
+    однопоточного HTTPServer не хватает — остальные запросы просто зависали.
+    """
+
+    daemon_threads = True
+    allow_reuse_address = True
+
+
+class DualStackHTTPServer(VideoHTTPServer):
+    """Один сокет и для IPv4, и для IPv6.
+
+    Нужен, потому что Windows/Chrome часто резолвят 'localhost' в '::1',
+    а сервер на '' слушал только IPv4 — браузер не мог подключиться.
+    """
+
+    address_family = socket.AF_INET6
+
+    def server_bind(self):
+        self.socket.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_V6ONLY, 0)
+        super().server_bind()
+
+
+def create_server(port=8080):
+    try:
+        return DualStackHTTPServer(('::', port), VideoRequestHandler), 'localhost и 127.0.0.1'
+    except OSError:
+        # IPv6 недоступен или порт занят IPv4-сокетом — работаем только на IPv4.
+        return VideoHTTPServer(('0.0.0.0', port), VideoRequestHandler), '127.0.0.1'
+
+
 if __name__ == '__main__':
-    print("Server running at http://localhost:8080")
+    httpd, addresses = create_server()
+    print("Server running at http://localhost:8080  (%s)" % addresses)
     print("Serving directory:", SERVE_DIR)
-    HTTPServer(('', 8080), VideoRequestHandler).serve_forever()
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        httpd.server_close()

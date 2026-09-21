@@ -71,9 +71,14 @@ python server.py
 
 ### Конфигурация сервера
 В `server.py` жёстко заданы:
-- порт `8080` (`HTTPServer(('', 8080), ...)`);
+- порт `8080` (`create_server()`);
 - корень раздачи — каталог, где лежит сам `server.py` (`SERVE_DIR`);
 - `MIME_OVERRIDES` — принудительные типы для `.webm`, `.mp4`, `.ogg`, `.ogv`.
+
+Сервер многопоточный (`ThreadingHTTPServer`, `daemon_threads`) и dual-stack
+(`AF_INET6` + `IPV6_V6ONLY=0`): браузер держит несколько Range-соединений на видео,
+однопоточный сервер на них зависал, а `localhost` на Windows резолвится в `::1`.
+При недоступном IPv6 происходит откат на `0.0.0.0`.
 
 ---
 

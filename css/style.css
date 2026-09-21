@@ -643,6 +643,16 @@ body {
     transform: none;
 }
 
+/* Items carrying a description hint (Bootstrap tooltip) hint about it */
+.category-tools-list li[data-bs-toggle="tooltip"] {
+    cursor: help;
+}
+
+#category-title i.bi-info-circle {
+    cursor: help;
+    font-size: 0.875rem;
+}
+
 /* Video time display */
 #video-time {
     font-variant-numeric: tabular-nums;
