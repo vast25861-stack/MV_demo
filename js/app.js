@@ -6,7 +6,7 @@ const STATE = {
     currentScenario: 'behavior',
     scenarioEvents: [],
     nextEventIndex: 0,
-    scenarioStartTime: null,
+    lastTime: 0,
     events: [],
     alerts: [],
     scenarioTimerId: null
@@ -67,12 +67,38 @@ function findScenario(name) {
     return key ? SCENARIOS[key] : null;
 }
 
+// Messages are keyed to clip time (not wall-clock) so they repeat together with the
+// `loop`ed video. Some clips are shorter than their schedule (diameter: 14s clip, 17s
+// of events), so timings are compressed to keep the whole cycle inside one round.
+function buildSchedule(events, duration) {
+    const schedule = events.map(e => ({ ...e, timeSeconds: parseTime(e.time) }));
+    const last = schedule.length ? schedule[schedule.length - 1].timeSeconds : 0;
+    if (duration && last > duration - 0.3) {
+        const k = Math.max(0.1, (duration - 0.3) / last);
+        schedule.forEach(e => e.timeSeconds *= k);
+    }
+    return schedule;
+}
+
+// Linear cursor over the schedule; used after a manual seek.
+function syncEventIndex() {
+    const t = video.currentTime;
+    const idx = STATE.scenarioEvents.findIndex(e => e.timeSeconds > t + 0.25);
+    STATE.nextEventIndex = idx === -1 ? STATE.scenarioEvents.length : idx;
+}
+
+// Loop wrap: the clip starts from zero, so the whole message cycle restarts as well.
+function restartCycle() {
+    STATE.nextEventIndex = 0;
+    STATE.lastTime = 0;
+}
+
 function loadScenario(name) {
     const sc = findScenario(name);
     if (!sc) return false;
 
     STATE.currentScenario = sc.name;
-    STATE.scenarioEvents = sc.events.map(e => ({ ...e, timeSeconds: parseTime(e.time), fired: false }));
+    STATE.scenarioEvents = buildSchedule(sc.events, 0);
     STATE.nextEventIndex = 0;
 
     $('scenario-badge').textContent = sc.name.toUpperCase();
@@ -145,27 +171,24 @@ function updateVideoTime() {
 function checkScenarioEvents() {
     if (!STATE.monitoringActive) return;
 
-    const elapsed = (Date.now() - STATE.scenarioStartTime) / 1000;
+    const t = video.currentTime;
     const events = STATE.scenarioEvents;
 
     while (STATE.nextEventIndex < events.length) {
         const evt = events[STATE.nextEventIndex];
-        if (evt.timeSeconds > elapsed + 0.5) break;
+        if (evt.timeSeconds > t + 0.25) break;
 
         const data = { message: evt.message, zone: evt.zone, severity: evt.severity };
         if (evt.type === 'event') addEvent(data);
         else addAlert({ type: evt.message, details: `Обнаружено в ${evt.zone}`, status: evt.severity });
 
-        evt.fired = true;
         STATE.nextEventIndex++;
     }
-
-    if (STATE.nextEventIndex >= events.length) stopMonitoring();
 }
 
 function startTimers() {
     if (STATE.scenarioTimerId) clearInterval(STATE.scenarioTimerId);
-    STATE.scenarioTimerId = setInterval(checkScenarioEvents, 500);
+    STATE.scenarioTimerId = setInterval(checkScenarioEvents, 250);
 }
 
 function clearTimers() {
@@ -185,13 +208,11 @@ function setVideoStatus(text, cls = 'bg-primary') {
 function startMonitoring() {
     if (STATE.monitoringActive) return;
 
-    const scenario = SCENARIOS[STATE.currentScenario];
+    const scenario = findScenario(STATE.currentScenario);
     if (!scenario) return;
 
     STATE.monitoringActive = true;
-    STATE.nextEventIndex = 0;
-    STATE.scenarioEvents.forEach(e => e.fired = false);
-    STATE.scenarioStartTime = Date.now();
+    STATE.lastTime = 0;
 
     setPlaceholderVisible(false);
     els.videoSeek.style.display = 'block';
@@ -204,6 +225,11 @@ function startMonitoring() {
 
     video.addEventListener('loadedmetadata', function onMetadata() {
         video.removeEventListener('loadedmetadata', onMetadata);
+        // Duration is known only here — rebuild the schedule to fit exactly one round.
+        STATE.scenarioEvents = buildSchedule(scenario.events, video.duration);
+        STATE.nextEventIndex = 0;
+        STATE.lastTime = 0;
+
         video.play().then(() => startTimers()).catch(err => {
             console.error('Play error:', err);
             setVideoStatus('Ожидание', 'bg-primary');
@@ -225,12 +251,11 @@ function stopMonitoring() {
 }
 
 function applyScenario(name) {
-    loadScenario(name);
-
     const modal = bootstrap.Modal.getInstance($('scenarioModal'));
     if (modal) modal.hide();
 
     stopMonitoring();
+    loadScenario(name);
     if (els.autoLoadVideo.checked) setTimeout(startMonitoring, 300);
 }
 
@@ -242,19 +267,28 @@ function initEventListeners() {
     $('scenario-badge').addEventListener('click', () => new bootstrap.Modal($('scenarioModal')).show());
 
     video.addEventListener('timeupdate', () => {
+        // `loop` rewinds currentTime to 0 — the message cycle restarts along with it.
+        if (STATE.monitoringActive && video.currentTime + 1 < STATE.lastTime) restartCycle();
+        STATE.lastTime = video.currentTime;
         updateVideoTime();
-        if (STATE.monitoringActive && video.duration && video.currentTime >= video.duration - 0.5) {
-            stopMonitoring();
-        }
     });
 
     video.addEventListener('play', () => setVideoStatus('Воспроизведение', 'bg-success'));
     video.addEventListener('pause', () => {
         if (STATE.monitoringActive) setVideoStatus('Пауза', 'bg-warning text-dark');
     });
-    video.addEventListener('ended', () => { if (STATE.monitoringActive) stopMonitoring(); });
+    // Fallback for browsers that ignore `loop`: replay the clip and the schedule.
+    video.addEventListener('ended', () => {
+        if (!STATE.monitoringActive) return;
+        video.currentTime = 0;
+        restartCycle();
+        video.play().catch(err => console.error('Replay error:', err));
+    });
     video.addEventListener('error', () => console.error('Video error:', video.error));
-    els.videoSeek.addEventListener('input', e => { video.currentTime = e.target.value; });
+    els.videoSeek.addEventListener('input', e => {
+        video.currentTime = e.target.value;
+        syncEventIndex();
+    });
 }
 
 function init() {
